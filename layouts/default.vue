@@ -3,19 +3,19 @@
     <!-- <Preloader v-if="isLoading" /> -->
     <MobileDeviceNavbar />
     
-    <!-- Show 404 if not on home page -->
-    <div v-if="!isHomePage" class="container d-flex align-items-center justify-content-center" style="min-height: 80vh">
+    <!-- Show 404 if not on an allowed page -->
+    <div v-if="!isAllowedPage" class="container d-flex align-items-center justify-content-center" style="min-height: 80vh">
       <div class="text-center">
         <h1 class="display-1 fw-bold">404</h1>
         <p class="fs-3"><span class="text-danger">Oops!</span> Page not found.</p>
-        <p class="lead">Only the home page is available.</p>
+        <p class="lead">This page is not available.</p>
         <NuxtLink to="/" class="btn btn-primary mt-4">
           Go Back to Home
         </NuxtLink>
       </div>
     </div>
 
-    <!-- Show home page content -->
+    <!-- Show allowed page content -->
     <NuxtPage v-else />
     
     <SearchPopup />
@@ -48,18 +48,23 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     
-    const isHomePage = computed(() => {
-      return route.path === "/" || route.name === "index";
+    const ALLOWED_ROUTES = ["/", "/terms-conditions", "/privacy-policy"];
+    const ALLOWED_NAMES  = ["index", "terms-conditions", "privacy-policy"];
+
+    const isAllowedPage = computed(() => {
+      return (
+        ALLOWED_ROUTES.includes(route.path) ||
+        ALLOWED_NAMES.includes(String(route.name))
+      );
     });
 
     const showContactSlide = computed(() => {
-      // adjust the check to match your profile route name/path
       return route.name !== "profile" && route.path !== "/profile";
     });
 
     const showFeedback = ref(false);
 
-    return { isHomePage, showContactSlide, showFeedback };
+    return { isAllowedPage, showContactSlide, showFeedback };
   },
   // data() {
   //   return {

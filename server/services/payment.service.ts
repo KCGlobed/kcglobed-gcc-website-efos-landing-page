@@ -12,10 +12,11 @@ export async function savePayment(data: any) {
       currency,
       status,
       response,
-      dossier_form_id
+      dossier_form_id,
+      source
     )
     VALUES (
-      $1, $2, $3, $4, $5, $6, $7, $8, $9,$10
+      $1, $2, $3, $4, $5, $6, $7, $8, $9,$10,$11
     )
     RETURNING id
   `;
@@ -30,7 +31,8 @@ export async function savePayment(data: any) {
     data.currency || 'INR',
     data.status || 'success',
     data.response,
-    data.form_id
+    data.form_id,
+    2
   ];
 
   const result = await pool.query(query, values);

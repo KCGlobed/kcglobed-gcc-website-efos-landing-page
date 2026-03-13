@@ -29,8 +29,15 @@
 
                             <div class="col-md-6 mb-2">
                                 <label class="form-label fw-bold small">Phone Number*</label>
-                                <input v-model="form.phone" type="tel" class="form-control custom-input"
-                                    placeholder="Enter your phone number">
+                                <input
+                                    v-model="form.phone"
+                                    type="tel"
+                                    class="form-control custom-input"
+                                    placeholder="Enter 10-digit mobile number"
+                                    maxlength="10"
+                                    @keydown="enforceDigits"
+                                    @paste.prevent
+                                >
                                 <small class="text-danger" v-if="errors.phone">{{ errors.phone }}</small>
                             </div>
 
@@ -285,6 +292,17 @@ export default defineComponent({
             }
         });
 
+        // Allow only digit keys; block everything else
+        const enforceDigits = (e: KeyboardEvent) => {
+            const allowedKeys = [
+                'Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'
+            ];
+            if (allowedKeys.includes(e.key)) return;
+            if (!/^[0-9]$/.test(e.key)) {
+                e.preventDefault();
+            }
+        };
+
         const validateEmail = (email: string) => {
             return String(email)
                 .toLowerCase()
@@ -312,6 +330,9 @@ export default defineComponent({
             }
             if (!form.phone.trim()) {
                 errors.phone = 'Phone number is required';
+                isValid = false;
+            } else if (!/^[6-9]\d{9}$/.test(form.phone.trim())) {
+                errors.phone = 'Enter a valid 10-digit Indian mobile number (starting with 6–9)';
                 isValid = false;
             }
             if (!form.state) {
@@ -342,7 +363,9 @@ export default defineComponent({
                     email: form.email,
                     phone: form.phone,
                     state: form.state,
-                    city: form.city
+                    city: form.city,
+                    source: 2,
+                    source_form: props.mode === 'apply' ? 1 : 2,
                 };
                 const config = useRuntimeConfig();
 
@@ -744,7 +767,8 @@ export default defineComponent({
             handleNavigation,
             alertPopup,
             isProcessing,
-            processingMessage
+            processingMessage,
+            enforceDigits
         };
     }
 });
