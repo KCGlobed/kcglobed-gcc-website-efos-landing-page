@@ -362,7 +362,7 @@ export default defineComponent({
                     if (checkRes.data?.isExist && props.mode === 'apply') {
                         isSubmitting.value = false;
                         await closeDossierModal();
-                        showAlert('', 'An account with this email address already exists. Please <a href="/login" class="text-purple fw-bold">log in</a> or <a href="/forgot-password" class="text-purple fw-bold">reset your password</a> if you <a href="/forgot-password" class="text-purple fw-bold">forgot it</a>.', 'error')
+                        showAlert('', 'An account with this email address already exists. Please check your login details in your inbox.', 'error')
                         return;
                     }
                 } catch (checkErr: any) {
@@ -535,9 +535,9 @@ export default defineComponent({
                     paymentId.value = pid;
                     processingMessage.value = 'Successfully registered! Redirecting to profile...';
 
-                    setTimeout(() => {
-                        window.location.href = '/profile';
-                    }, 3000);
+                    // setTimeout(() => {
+                    //     window.location.href = '/profile';
+                    // }, 3000);
                 }
             } catch (err: any) {
                 await closeStatusModal();
@@ -680,18 +680,18 @@ export default defineComponent({
                                     paymentId.value = res.cf_order_id;
                                     processingMessage.value = 'Payment Successful! Redirecting to profile...';
                                     resetForm();
-                                    setTimeout(() => {
-                                        window.location.href = '/profile';
-                                    }, 3000);
+                                    // setTimeout(() => {
+                                    //     window.location.href = '/profile';
+                                    // }, 3000);
                                 }
                             } catch (regErr: any) {
                                 console.error("[PAYMENT] Registration error after payment:", regErr);
                                 paymentStatus.value = 'success';
                                 paymentId.value = res.cf_order_id;
                                 processingMessage.value = 'Payment Successful! Redirecting to profile...';
-                                setTimeout(() => {
-                                    window.location.href = '/profile';
-                                }, 3000);
+                                // setTimeout(() => {
+                                //     window.location.href = '/profile';
+                                // }, 3000);
                             }
 
                         } catch (e) {
