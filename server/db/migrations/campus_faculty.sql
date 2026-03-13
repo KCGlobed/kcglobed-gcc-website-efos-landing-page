@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS campus_faculty (
+    id SERIAL PRIMARY KEY,
+    full_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    mobile VARCHAR(50) NOT NULL,
+    city VARCHAR(255) NOT NULL,
+    state VARCHAR(255) NOT NULL,
+    address TEXT NOT NULL,
+    institution_name VARCHAR(255) NOT NULL,
+    department VARCHAR(255) NOT NULL,
+    designation VARCHAR(255) NOT NULL,
+    teaching_experience VARCHAR(50) NOT NULL,
+    industrial_experience VARCHAR(255),
+    highest_qualification VARCHAR(255) NOT NULL,
+    motivation TEXT NOT NULL,
+    support_activities JSONB NOT NULL,
+    student_reach VARCHAR(255) NOT NULL,
+    consent BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

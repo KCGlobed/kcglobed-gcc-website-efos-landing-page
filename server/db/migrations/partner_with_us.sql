@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS partner_with_us (
+  id SERIAL PRIMARY KEY,
+  organization_name VARCHAR(255) NOT NULL,
+  year_of_establishment VARCHAR(10) NOT NULL,
+  organization_type VARCHAR(255) NOT NULL,
+  organization_type_other VARCHAR(255),
+  website VARCHAR(255),
+  contact_name VARCHAR(255) NOT NULL,
+  designation VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  mobile VARCHAR(50) NOT NULL,
+  city VARCHAR(255) NOT NULL,
+  state VARCHAR(255) NOT NULL,
+  interests JSONB NOT NULL,
+  description TEXT NOT NULL,
+  value_add TEXT NOT NULL,
+  declaration BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS career_application (
+    id SERIAL PRIMARY KEY,
+    full_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    mobile VARCHAR(50) NOT NULL,
+    city VARCHAR(255) NOT NULL,
+    state VARCHAR(255) NOT NULL,
+    highest_qualification VARCHAR(255) NOT NULL,
+    employment_status VARCHAR(255) NOT NULL,
+    experience_years VARCHAR(50) NOT NULL,
+    area_of_interest VARCHAR(255) NOT NULL,
+    area_of_interest_other VARCHAR(255),
+    contribution_summary TEXT,
+    resume_path VARCHAR(255),
+    linkedin_profile VARCHAR(255),
+    notice_period VARCHAR(50) NOT NULL,
+    consent BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
