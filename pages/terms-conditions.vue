@@ -1,6 +1,6 @@
 <template>
   <div>
-    <LayoutTopHeader />
+    <!-- <LayoutTopHeader /> -->
     <LayoutMainNavbar />
     <TermsConditions />
     <LayoutMainFooter />
