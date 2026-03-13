@@ -1,6 +1,5 @@
 <template>
   <div>
-    <LayoutTopHeader />
     <LayoutMainNavbar />
     <HomeOneMainBanner />
     <HomeOneInformationForInternationalStudents />

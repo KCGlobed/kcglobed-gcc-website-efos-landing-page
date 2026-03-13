@@ -2,17 +2,25 @@
   <div>
     <!-- <Preloader v-if="isLoading" /> -->
     <MobileDeviceNavbar />
-    <NuxtPage />
+    
+    <!-- Show 404 if not on home page -->
+    <div v-if="!isHomePage" class="container d-flex align-items-center justify-content-center" style="min-height: 80vh">
+      <div class="text-center">
+        <h1 class="display-1 fw-bold">404</h1>
+        <p class="fs-3"><span class="text-danger">Oops!</span> Page not found.</p>
+        <p class="lead">Only the home page is available.</p>
+        <NuxtLink to="/" class="btn btn-primary mt-4">
+          Go Back to Home
+        </NuxtLink>
+      </div>
+    </div>
+
+    <!-- Show home page content -->
+    <NuxtPage v-else />
+    
     <SearchPopup />
     <MainSidebar />
     <GoTop />
-
-    <!-- feedback button & popup -->
-    <button class="feedback-btn" @click="showFeedback = true"><i class="ti ti-message"></i></button>
-    <FeedbackPopup v-model="showFeedback" />
-
-    <!-- only show on non‑profile routes -->
-    <ContactSlide v-if="showContactSlide" />
   </div>
 </template>
 
@@ -39,6 +47,11 @@ export default defineComponent({
   },
   setup() {
     const route = useRoute();
+    
+    const isHomePage = computed(() => {
+      return route.path === "/" || route.name === "index";
+    });
+
     const showContactSlide = computed(() => {
       // adjust the check to match your profile route name/path
       return route.name !== "profile" && route.path !== "/profile";
@@ -46,7 +59,7 @@ export default defineComponent({
 
     const showFeedback = ref(false);
 
-    return { showContactSlide, showFeedback };
+    return { isHomePage, showContactSlide, showFeedback };
   },
   // data() {
   //   return {

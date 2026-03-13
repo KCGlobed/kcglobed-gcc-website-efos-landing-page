@@ -10,7 +10,7 @@
             <div class="row g-4 justify-content-center align-items-center">
 
                 <div v-for="(img, index) in images" :key="index" class="col-lg-4 col-md-6 col-sm-12">
-                    <a :href="img.link" target="_blank">
+                    <a :href="img.link">
                         <div class="image-box">
                             <img :src="img.img" alt="Industry Mentor" class="img-fluid">
                         </div>
@@ -38,51 +38,51 @@ import industryMentor12 from '@/assets/img/industoryMentorTwo/12.png'
 const images = [
     {
         img: industryMentor1,
-        link: "https://www.linkedin.com/in/senthil-kumar-5b8a1b8a/"
+        link: "#"
     },
     {
         img: industryMentor2,
-        link: "https://www.linkedin.com/in/senthil-kumar-5b8a1b8a/"
+        link: "#"
     },
     {
         img: industryMentor3,
-        link: "https://www.linkedin.com/in/senthil-kumar-5b8a1b8a/"
+        link: "#"
     },
     {
         img: industryMentor4,
-        link: "https://www.linkedin.com/in/senthil-kumar-5b8a1b8a/"
+        link: "#"
     },
     {
         img: industryMentor5,
-        link: "https://www.linkedin.com/in/senthil-kumar-5b8a1b8a/"
+        link: "#"
     },
     {
         img: industryMentor6,
-        link: "https://www.linkedin.com/in/senthil-kumar-5b8a1b8a/"
+        link: "#"
     },
     {
         img: industryMentor7,
-        link: "https://www.linkedin.com/in/senthil-kumar-5b8a1b8a/"
+        link: "#"
     },
     {
         img: industryMentor8,
-        link: "https://www.linkedin.com/in/senthil-kumar-5b8a1b8a/"
+        link: "#"
     },
     {
         img: industryMentor9,
-        link: "https://www.linkedin.com/in/senthil-kumar-5b8a1b8a/"
+        link: "#"
     },
     {
         img: industryMentor10,
-        link: "https://www.linkedin.com/in/senthil-kumar-5b8a1b8a/"
+        link: "#"
     },
     {
         img: industryMentor11,
-        link: "https://www.linkedin.com/in/senthil-kumar-5b8a1b8a/"
+        link: "#"
     },
     {
         img: industryMentor12,
-        link: "https://www.linkedin.com/in/senthil-kumar-5b8a1b8a/"
+        link: "#"
     },
 
 

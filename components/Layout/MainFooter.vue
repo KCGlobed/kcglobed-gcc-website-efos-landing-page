@@ -1,80 +1,11 @@
 <template>
   <div class="footer-warp ptb-80">
     <div class="container">
-      <div class="row g-4">
-        <div class="col-lg-8 col-sm-12">
-          <div class="footer-widget">
-            <h3>Quick Links</h3>
-            <div class="row">
-              <div class="col-lg-12">
-                <ul class="footer-list footer-links-grid">
-                  <li>
-                    <NuxtLink to="/">Home</NuxtLink>
-                  </li>
-                  <li>
-                    <NuxtLink to="/programs">Program</NuxtLink>
-                  </li>
-                  <li>
-                    <NuxtLink to="/nfet">NFET Exam</NuxtLink>
-                  </li>
-                  <!-- <li>
-                    <NuxtLink to="/admissions">Student Admission</NuxtLink>
-                  </li> -->
-                  <li>
-                    <NuxtLink to="/campus-life">Campus Life</NuxtLink>
-                  </li>
-                  <li>
-                    <NuxtLink to="/about-overview">About Us</NuxtLink>
-                  </li>
-                  <!-- <li>
-                    <NuxtLink to="/contact-us">Contact Us</NuxtLink>
-                  </li> -->
-                  <li><a href="https://www.kcglobed.com/" target="_blank">KC GlobEd</a></li>
-                  <li>
-                    <NuxtLink to="/campus-ceo/student">Ambassador</NuxtLink>
-                  </li>
-                  <li>
-                    <NuxtLink to="/partner-with-us">Corporate Partner</NuxtLink>
-                  </li>
-                  <li>
-                    <NuxtLink to="/career">Careers</NuxtLink>
-                  </li>
-                  <li class="apply-now-li">
-                    <button class="footer-apply-btn" @click="openApplyModal">Apply Now</button>
-                  </li>
-                  <li v-if="isAuthenticated">
-                    <NuxtLink to="/profile">Profile</NuxtLink>
-                  </li>
-                  <li v-if="!isAuthenticated">
-                    <NuxtLink to="/login">Login</NuxtLink>
-                  </li>
-                  <li v-else>
-                    <a @click="handleLogout" style="cursor: pointer;">Logout</a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-          </div>
-        </div>
-        <div class="col-lg-4 col-sm-12">
-          <div class="footer-widget">
-            <h3>Subscribe Newsletter</h3>
-            <div class="footer-form mb-4">
-              <form @submit.prevent="subscribe">
-                <input v-model="email" type="email" required class="form-control" placeholder="Enter Email Address" />
-                <button class="footer-btn" type="submit" :disabled="loading">
-                  <span>{{ loading ? "Subscribing..." : "Subscribe Now" }}</span>
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
+     
       <div class="row">
         <div class="col-lg-12">
           <div class="company-adrr">
-            <div class="footer-info mt-4">
+            <div class="footer-info">
               <div class="row g-4">
                 <div class="col-lg-4 col-md-4">
                   <div class="address-item">
@@ -245,7 +176,6 @@ export default {
 }
 
 .footer-info {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: 30px;
 }
 
