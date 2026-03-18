@@ -1,58 +1,15 @@
-// ── CASHFREE: active (cashfree-pg v5) ────────────────────────────────────────
+// ── Unified Payment Complete ──────────────────────────────────────────────
 import { createCashfreeInstance } from "../utils/cashfree";
+import { createRazorpayInstance } from "../utils/razorpay";
 import { savePayment } from "../services/payment.service";
 import { sendPaymentConfirmationEmail } from "../services/email.service";
-
-// ── RAZORPAY: disabled (kept for reference) ───────────────────────────────────
-// import Razorpay from "razorpay";
-// import crypto from "crypto";
-
-// Helper: try to extract form_id from the order_id string (e.g. "cf_322_1772694830212" → "322")
-function extractFormIdFromOrderId(orderId: string): string | null {
-    const parts = orderId.split('_');
-    // order_id format: cf_{form_id}_{timestamp}  or  cf_{user_id}_{timestamp}
-    if (parts.length >= 3) {
-        const extracted = parts[1];
-        if (extracted && extracted !== 'guest' && extracted !== 'null') return extracted;
-    }
-    return null;
-}
+import crypto from "crypto";
 
 export default defineEventHandler(async (event) => {
     const body = await readBody(event);
-
-    // ── CASHFREE fields ───────────────────────────────────────────────────────
-    // NOTE: The Cashfree JS SDK does NOT return a numeric cf_payment_id in the callback.
-    // We only need cf_order_id — we fetch all payments server-side via PGOrderFetchPayments.
-    const { cf_order_id } = body;
-
-    // ── RAZORPAY fields (disabled) ────────────────────────────────────────────
-    // const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body;
-
-    if (!cf_order_id) {
-        console.error("[PAYMENT][complete] FAILED — Missing cf_order_id", {
-            event: "complete_payment_failed",
-            reason: "missing_cf_order_id",
-            timestamp: new Date().toISOString()
-        });
-        throw createError({ statusCode: 400, message: "Missing required order ID" });
-    }
-
     const config = useRuntimeConfig(event);
+    const activeGateway = config.paymentGateway || 'RAZORPAY';
 
-    // ── CASHFREE: Initialize SDK ──────────────────────────────────────────────
-    let cashfree: ReturnType<typeof createCashfreeInstance>["instance"];
-    let cfEnvironment: string;
-    try {
-        const cf = createCashfreeInstance(config, event);
-        cashfree = cf.instance;
-        cfEnvironment = cf.cfEnvironment;
-    } catch (e: any) {
-        console.error("[PAYMENT][complete] FAILED — Cashfree config error", { reason: e.message, cf_order_id });
-        throw createError({ statusCode: 500, message: "Cashfree configuration missing on server" });
-    }
-
-    // Extract user metadata from order
     let userId: string | null = null;
     let formType: string | null = null;
     let formId: string | null = null;
@@ -63,195 +20,158 @@ export default defineEventHandler(async (event) => {
     let currency = 'INR';
     let state = "";
     let city = "";
-
-    // ── CASHFREE: Fetch Order to get user context ─────────────────────────────
-    try {
-        const orderRes = await cashfree.PGFetchOrder(cf_order_id);
-        const orderData = orderRes.data;
-
-        amount = orderData.order_amount || 0;
-        currency = orderData.order_currency || 'INR';
-
-        // Try to parse order_note JSON (stored at order creation in start-payment)
-        if (orderData.order_note) {
-            try {
-                console.log("Himanshu order_note", orderData.order_note);
-                const note = JSON.parse(orderData.order_note);
-                userId = note.user_id || null;
-                formType = note.form_type ? String(note.form_type) : null;
-                formId = note.form_id ? String(note.form_id) : null;
-                userName = note.name || '';
-                userEmail = note.email || '';
-                userMobile = note.mobile || '';
-                state = note.state || '';
-                city = note.city || '';
-            } catch (_) {
-                console.warn("[PAYMENT][complete] Could not parse order_note JSON — using fallback", { cf_order_id });
-            }
-        }
-
-        // Fallback: extract form_id from order_id string (e.g. "cf_322_..." → "322")
-        if (!formId) {
-            formId = extractFormIdFromOrderId(cf_order_id);
-            if (formId) {
-                console.log("[PAYMENT][complete] Extracted form_id from order_id", { cf_order_id, form_id: formId });
-            }
-        }
-
-        // Fallback: use customer_details from Cashfree order
-        if (!userEmail && orderData.customer_details?.customer_email) userEmail = orderData.customer_details.customer_email;
-        if (!userName && orderData.customer_details?.customer_name) userName = orderData.customer_details.customer_name;
-        if (!userMobile && orderData.customer_details?.customer_phone) userMobile = orderData.customer_details.customer_phone;
-
-        console.log("[PAYMENT][complete] Cashfree order fetched", {
-            event: "order_fetched",
-            gateway: "cashfree",
-            environment: cfEnvironment,
-            cf_order_id, amount, currency,
-            user_id: userId, name: userName, email: userEmail,
-            form_type: formType, form_id: formId,
-            timestamp: new Date().toISOString()
-        });
-
-    } catch (error: any) {
-        console.error("[PAYMENT][complete] FAILED — Error fetching Cashfree order", {
-            event: "order_fetch_failed",
-            gateway: "cashfree",
-            cf_order_id,
-            error_message: error?.response?.data?.message || error?.message,
-            timestamp: new Date().toISOString()
-        });
-        throw createError({
-            statusCode: error.statusCode || 500,
-            message: error?.response?.data?.message || error?.message || "Failed to fetch order details"
-        });
-    }
-
-    // ── CASHFREE: Verify Payment via PGOrderFetchPayments ────────────────────
-    // The Cashfree JS SDK does NOT return a numeric cf_payment_id — we fetch all
-    // payments for this order and find the successful one server-side.
-    //
-    // ── RAZORPAY: Signature Verification (disabled) ───────────────────────────
-    // const generated_signature = crypto.createHmac("sha256", keySecret)
-    //     .update(razorpay_order_id + "|" + razorpay_payment_id).digest("hex");
-    // if (generated_signature !== razorpay_signature) { ... }
-
     let actualPaymentId = 'N/A';
+    let orderIdForDb = '';
 
-    try {
-        // PGOrderFetchPayments (plural) — fetches all payment attempts for this order
-        const paymentsRes = await cashfree.PGOrderFetchPayments(cf_order_id);
-        const payments: any[] = Array.isArray(paymentsRes.data) ? paymentsRes.data : [paymentsRes.data];
+    if (activeGateway === 'RAZORPAY') {
+        const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body;
+        orderIdForDb = razorpay_order_id;
 
-        const successPayment = payments.find((p: any) => p.payment_status === 'SUCCESS');
-
-        if (!successPayment) {
-            const latestStatus = payments[0]?.payment_status || 'UNKNOWN';
-
-            console.error("[PAYMENT][complete] FAILED — No successful payment found", {
-                event: "payment_not_successful",
-                status: "failed",
-                gateway: "cashfree",
-                cf_order_id,
-                latest_status: latestStatus,
-                payment_count: payments.length,
-                user_id: userId, name: userName, email: userEmail, amount, currency,
-                form_type: formType, form_id: formId,
-                timestamp: new Date().toISOString()
-            });
-
-            await savePayment({
-                student_id: userId,
-                form_type: formType || 1,
-                form_id: formId,
-                razorpay_order_id: cf_order_id,
-                razorpay_payment_id: payments[0]?.cf_payment_id || 'N/A',
-                razorpay_signature: `cf_status:${latestStatus}`,
-                amount, currency,
-                status: "failed",
-                response: JSON.stringify({ cf_order_id, payment_status: latestStatus, gateway: "cashfree", payments })
-            });
-
-            throw createError({ statusCode: 400, message: `Payment not successful. Status: ${latestStatus}` });
+        if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+            console.error("[PAYMENT][complete] FAILED — Missing Razorpay fields", { razorpay_order_id, razorpay_payment_id });
+            throw createError({ statusCode: 400, message: "Missing Razorpay payment details" });
         }
 
-        actualPaymentId = String(successPayment.cf_payment_id);
+        const keySecret = (config.razorpayKeySecret || process.env.RAZORPAY_KEY_SECRET || "").replace(/['"]/g, '').trim();
+        const generated_signature = crypto.createHmac("sha256", keySecret)
+            .update(razorpay_order_id + "|" + razorpay_payment_id).digest("hex");
 
-        console.log("[PAYMENT][complete] Cashfree payment verified — status SUCCESS", {
-            event: "payment_verified",
-            gateway: "cashfree",
-            cf_order_id,
-            cf_payment_id: actualPaymentId,
-            payment_status: successPayment.payment_status,
-            user_id: userId, name: userName, email: userEmail,
-            form_type: formType, form_id: formId,
-            timestamp: new Date().toISOString()
-        });
+        if (generated_signature !== razorpay_signature) {
+            console.error("[PAYMENT][complete] Razorpay signature verification failed");
+            throw createError({ statusCode: 400, message: "Invalid payment signature" });
+        }
 
-        // API will call to send mail with email and password
+        try {
+            const { instance: razorpay } = createRazorpayInstance(config);
+            const orderRes = await razorpay.orders.fetch(razorpay_order_id);
+            amount = Number(orderRes.amount) / 100;
+            currency = orderRes.currency;
 
-    } catch (error: any) {
-        if (error.statusCode) throw error;
-        console.error("[PAYMENT][complete] FAILED — Error verifying Cashfree payment", {
-            event: "payment_verify_failed",
-            cf_order_id,
-            error_message: error?.response?.data?.message || error?.message,
-            timestamp: new Date().toISOString()
-        });
-        throw createError({ statusCode: 500, message: "Failed to verify payment" });
+            if (orderRes.notes) {
+                userId = orderRes.notes.user_id ? String(orderRes.notes.user_id) : null;
+                formType = orderRes.notes.form_type ? String(orderRes.notes.form_type) : null;
+                formId = orderRes.notes.form_id ? String(orderRes.notes.form_id) : null;
+                userName = orderRes.notes.name ? String(orderRes.notes.name) : '';
+                userEmail = orderRes.notes.email ? String(orderRes.notes.email) : '';
+                userMobile = orderRes.notes.mobile ? String(orderRes.notes.mobile) : '';
+                state = orderRes.notes.state ? String(orderRes.notes.state) : '';
+                city = orderRes.notes.city ? String(orderRes.notes.city) : '';
+            }
+            actualPaymentId = razorpay_payment_id;
+
+            console.log("[PAYMENT][complete] Razorpay payment verified", {
+                order_id: razorpay_order_id,
+                payment_id: actualPaymentId,
+                email: userEmail
+            });
+        } catch (error: any) {
+            console.error("[PAYMENT][complete] Error fetching Razorpay order", error);
+            throw createError({ statusCode: 500, message: "Failed to fetch order details" });
+        }
+    } else {
+        // DEFAULT: CASHFREE
+        const { cf_order_id } = body;
+        orderIdForDb = cf_order_id;
+
+        if (!cf_order_id) {
+            console.error("[PAYMENT][complete] FAILED — Missing cf_order_id");
+            throw createError({ statusCode: 400, message: "Missing Cashfree order ID" });
+        }
+
+        let cashfree: ReturnType<typeof createCashfreeInstance>["instance"];
+        try {
+            const cf = createCashfreeInstance(config, event);
+            cashfree = cf.instance;
+        } catch (e: any) {
+            throw createError({ statusCode: 500, message: "Cashfree configuration missing on server" });
+        }
+
+        try {
+            const orderRes = await cashfree.PGFetchOrder(cf_order_id);
+            const orderData = orderRes.data;
+            amount = orderData.order_amount || 0;
+            currency = orderData.order_currency || 'INR';
+
+            // Check order_note first (as JSON) or order_tags
+            if (orderData.order_note) {
+                try {
+                    const note = JSON.parse(orderData.order_note);
+                    userId = note.user_id || null;
+                    formType = note.form_type ? String(note.form_type) : null;
+                    formId = note.form_id ? String(note.form_id) : null;
+                    userName = note.name || '';
+                    userEmail = note.email || '';
+                    userMobile = note.mobile || '';
+                    state = note.state || '';
+                    city = note.city || '';
+                } catch (e) {
+                    // Fallback to tags if note is not JSON
+                }
+            }
+
+            if (!formId && orderData.order_tags) {
+                userId = orderData.order_tags.user_id || null;
+                formType = orderData.order_tags.form_type || null;
+                formId = orderData.order_tags.form_id || null;
+                city = orderData.order_tags.city || '';
+                state = orderData.order_tags.state || '';
+            }
+
+            if (orderData.customer_details) {
+                if (!userName) userName = orderData.customer_details.customer_name || '';
+                if (!userEmail) userEmail = orderData.customer_details.customer_email || '';
+                if (!userMobile) userMobile = orderData.customer_details.customer_phone || '';
+            }
+
+            const paymentsRes = await cashfree.PGOrderFetchPayments(cf_order_id);
+            const payments: any[] = Array.isArray(paymentsRes.data) ? paymentsRes.data : [paymentsRes.data];
+            const successPayment = payments.find((p: any) => p.payment_status === 'SUCCESS');
+
+            if (!successPayment) {
+                throw createError({ statusCode: 400, message: "Payment not successful" });
+            }
+            actualPaymentId = String(successPayment.cf_payment_id);
+
+            console.log("[PAYMENT][complete] Cashfree payment verified", {
+                order_id: cf_order_id,
+                payment_id: actualPaymentId,
+                email: userEmail
+            });
+        } catch (error: any) {
+            if (error.statusCode) throw error;
+            console.error("[PAYMENT][complete] Error verifying Cashfree payment", error);
+            throw createError({ statusCode: 500, message: "Failed to verify Cashfree payment" });
+        }
     }
 
     // ── Save success to DB ────────────────────────────────────────────────────
     try {
-        const paymentId = await savePayment({
+        const paymentDbId = await savePayment({
             student_id: userId,
             form_type: formType || 1,
             form_id: formId,
-            razorpay_order_id: cf_order_id,
+            razorpay_order_id: orderIdForDb,
             razorpay_payment_id: actualPaymentId,
-            razorpay_signature: `cf_verified`,
+            razorpay_signature: `${activeGateway.toLowerCase()}_verified`,
             amount, currency,
             status: "success",
-            response: JSON.stringify({ cf_order_id, cf_payment_id: actualPaymentId, gateway: "cashfree" })
+            response: JSON.stringify({
+                order_id: orderIdForDb,
+                payment_id: actualPaymentId,
+                gateway: activeGateway.toLowerCase(),
+                name: userName,
+                email: userEmail,
+                mobile: userMobile,
+                city, state
+            })
         });
 
-        console.log("[PAYMENT][complete] SUCCESS — Payment saved to DB", {
-            event: "payment_completed",
-            status: "success",
-            gateway: "cashfree",
-            payment_db_id: paymentId,
-            cf_order_id, cf_payment_id: actualPaymentId, amount, currency,
-            user_id: userId, name: userName, email: userEmail, mobile: userMobile,
-            form_type: formType, form_id: formId,
-            timestamp: new Date().toISOString()
-        });
+        // Optional: send confirmation email logic here
+        // if (userEmail) { ... }
 
-        return { success: true, message: "Payment verified and saved successfully", payment_id: paymentId };
-
+        return { success: true, message: "Payment verified and saved successfully", payment_id: paymentDbId };
     } catch (error: any) {
-        console.error("[PAYMENT][complete] FAILED — Error saving payment to DB", {
-            event: "save_failed",
-            gateway: "cashfree",
-            cf_order_id, cf_payment_id: actualPaymentId,
-            user_id: userId, error_message: error.message || error,
-            timestamp: new Date().toISOString()
-        });
-
-        try {
-            await savePayment({
-                student_id: userId, form_type: formType || 1, form_id: formId,
-                razorpay_order_id: cf_order_id, razorpay_payment_id: actualPaymentId,
-                razorpay_signature: `cf_save_failed`,
-                amount, currency, status: "failed",
-                response: JSON.stringify({ cf_order_id, error: error.message, gateway: "cashfree" })
-            });
-        } catch (innerError: any) {
-            console.error("[PAYMENT][complete] CRITICAL — Failed to save failure fallback to DB", {
-                cf_order_id, error_message: innerError?.message,
-                timestamp: new Date().toISOString()
-            });
-        }
-
+        console.error("[PAYMENT][complete] Error saving payment to DB", error);
         throw createError({ statusCode: 500, message: error.message || "Failed to save payment" });
     }
 });

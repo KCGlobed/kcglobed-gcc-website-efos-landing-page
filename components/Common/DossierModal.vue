@@ -131,6 +131,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, reactive, nextTick, defineAsyncComponent, onMounted, watch } from 'vue';
+import { isValidMobile } from "~/utils/validators";
 import stateCityData from '~/state_city.json';
 
 export default defineComponent({
@@ -254,7 +255,7 @@ export default defineComponent({
         });
 
         const stateCity = stateCityData as Record<string, string[]>;
-        const states = ref<string[]>(Object.keys(stateCity).sort());
+        const states = ref<string[]>([]);
         const citiesList = ref<string[]>([]);
 
         const onStateChange = () => {
@@ -266,7 +267,9 @@ export default defineComponent({
                 citiesList.value = [];
                 return;
             }
-            citiesList.value = stateCity[newState] || [];
+            // Populate cities from local JSON and sort alphabetically
+            const cities = (stateCityData as any)[newState] || [];
+            citiesList.value = [...cities].sort((a, b) => a.localeCompare(b));
         });
 
         // Allow only digit keys; block everything else
@@ -308,8 +311,8 @@ export default defineComponent({
             if (!form.phone.trim()) {
                 errors.phone = 'Phone number is required';
                 isValid = false;
-            } else if (!/^[6-9]\d{9}$/.test(form.phone.trim())) {
-                errors.phone = 'Enter a valid 10-digit Indian mobile number (starting with 6–9)';
+            } else if (!isValidMobile(form.phone)) {
+                errors.phone = 'Please enter a valid 10-digit mobile number';
                 isValid = false;
             }
             if (!form.state) {
@@ -439,17 +442,17 @@ export default defineComponent({
             });
         };
 
-        // ── RAZORPAY: Load Script (disabled) ─────────────────────────────────────
-        // const loadRazorpayScript = () => {
-        //     return new Promise((resolve) => {
-        //         if ((window as any).Razorpay) { resolve(true); return; }
-        //         const script = document.createElement("script");
-        //         script.src = "https://checkout.razorpay.com/v1/checkout.js";
-        //         script.onload = () => resolve(true);
-        //         script.onerror = () => resolve(false);
-        //         document.body.appendChild(script);
-        //     });
-        // };
+        // ── RAZORPAY: Load Script ─────────────────────────────────────
+        const loadRazorpayScript = () => {
+            return new Promise((resolve) => {
+                if ((window as any).Razorpay) { resolve(true); return; }
+                const script = document.createElement("script");
+                script.src = "https://checkout.razorpay.com/v1/checkout.js";
+                script.onload = () => resolve(true);
+                script.onerror = () => resolve(false);
+                document.body.appendChild(script);
+            });
+        };
 
         // Helper to aggressively restore body scroll
         const restoreBodyScroll = () => {
@@ -496,6 +499,44 @@ export default defineComponent({
             });
         };
 
+        const postPaymentSuccess = async (pid: string) => {
+            // 6. Create Student Account after successful payment
+            const config = useRuntimeConfig();
+            processingMessage.value = 'Creating your account...';
+            try {
+                const studentRes: any = await $fetch(
+                    `${config.public.apiBase}/api/users/create_student/`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: {
+                            "full_name": form.name,
+                            "email": form.email,
+                            "city": form.city,
+                            "state": form.state,
+                            "country": "India",
+                            "phone1": form.phone
+                        },
+                    }
+                );
+
+                if (studentRes.success && studentRes.data?.password) {
+                    await autoLogin(form.email, studentRes.data.password, pid);
+                } else {
+                    // Fallback success state if registration fails but payment was done
+                    paymentStatus.value = 'success';
+                    paymentId.value = pid;
+                    processingMessage.value = 'Payment Successful!';
+                    resetForm();
+                }
+            } catch (regErr: any) {
+                console.error("[PAYMENT] Registration error after payment:", regErr);
+                paymentStatus.value = 'success';
+                paymentId.value = pid;
+                processingMessage.value = 'Payment Successful!';
+            }
+        };
+
         const handleNavigation = () => {
             // Let the router go wherever it wants via NuxtLink
             // but force the modal to close locally to clear backdrops
@@ -533,11 +574,8 @@ export default defineComponent({
                     // Show final success state in the modal
                     paymentStatus.value = 'success';
                     paymentId.value = pid;
-                    processingMessage.value = 'Successfully registered! Redirecting to profile...';
-
-                    // setTimeout(() => {
-                    //     window.location.href = '/profile';
-                    // }, 3000);
+                    processingMessage.value = 'Successfully registered!';
+                    resetForm();
                 }
             } catch (err: any) {
                 await closeStatusModal();
@@ -592,6 +630,8 @@ export default defineComponent({
                         name: form.name,
                         email: form.email,
                         mobile: form.phone,
+                        city: form.city,
+                        state: form.state,
                         form_type: 2,
                         form_id: formId.value
                     }
@@ -603,104 +643,145 @@ export default defineComponent({
                     return;
                 }
 
-                // Close DossierModal once we are moving to payment gateway
-                await closeDossierModal();
-                // Temporarily hide StatusModal while Cashfree is open to avoid overlay confusion
-                await closeStatusModal();
+                if (res.gateway === 'razorpay') {
+                    // 3. Load Razorpay JS SDK
+                    const loaded = await loadRazorpayScript();
+                    if (!loaded || !(window as any).Razorpay) {
+                        await closeStatusModal();
+                        alert("Razorpay SDK failed to load");
+                        return;
+                    }
 
-                // 3. Load Cashfree JS SDK
-                const loaded = await loadCashfreeScript();
-                if (!loaded || !(window as any).Cashfree) {
-                    alert("Cashfree SDK failed to load");
-                    return;
-                }
+                    // 4. Open Razorpay Checkout
+                    const options = {
+                        key: res.key,
+                        amount: res.amount * 100,
+                        currency: res.currency,
+                        name: "KCGlobed GCC",
+                        description: "Application Fee",
+                        order_id: res.order_id,
+                        handler: async (response: any) => {
+                            await openStatusModal('processing', 'Verifying payment...');
+                            try {
+                                await $fetch("/api/complete-payment", {
+                                    method: "POST",
+                                    body: {
+                                        razorpay_order_id: response.razorpay_order_id,
+                                        razorpay_payment_id: response.razorpay_payment_id,
+                                        razorpay_signature: response.razorpay_signature
+                                    }
+                                });
+                                await postPaymentSuccess(res.order_id);
+                                await closeDossierModal();
+                            } catch (e) {
+                                await closeStatusModal();
+                                showAlert('Payment Error', 'Payment verification failed. Please contact support.', 'error');
+                            }
+                        },
+                        prefill: {
+                            name: form.name,
+                            email: form.email,
+                            contact: form.phone
+                        },
+                        theme: {
+                            color: "#8A2BE2"
+                        },
+                        modal: {
+                            ondismiss: async () => {
+                                console.log("Razorpay payment dismissed");
+                                try {
+                                    await $fetch("/api/report-payment-failure", {
+                                        method: "POST",
+                                        body: {
+                                            razorpay_order_id: res.order_id,
+                                            error_description: "Payment cancelled by user"
+                                        }
+                                    });
+                                } catch (e) { console.error("Failed to report failure:", e); }
+                            }
+                        }
+                    };
 
-                // 4. Open Cashfree Checkout
-                const cfMode = res.environment === 'PRODUCTION' ? 'production' : 'sandbox';
-                const cashfree = (window as any).Cashfree({ mode: cfMode });
-
-                cashfree.checkout({
-                    paymentSessionId: res.payment_session_id,
-                    redirectTarget: "_modal"
-                }).then(async (result: any) => {
-                    restoreBodyScroll();
-
-                    if (result.error) {
-                        console.error("[PAYMENT] Cashfree error:", result.error);
+                    const rzp = new (window as any).Razorpay(options);
+                    rzp.on('payment.failed', async (response: any) => {
                         try {
                             await $fetch("/api/report-payment-failure", {
                                 method: "POST",
                                 body: {
-                                    cf_order_id: res.cf_order_id,
-                                    cf_payment_id: result.error?.payment_id || null,
-                                    error_code: result.error?.code,
-                                    error_description: result.error?.message,
-                                    error_source: result.error?.source
+                                    razorpay_order_id: res.order_id,
+                                    razorpay_payment_id: response.error.metadata.payment_id,
+                                    error_code: response.error.code,
+                                    error_description: response.error.description,
+                                    error_source: response.error.source,
+                                    error_step: response.error.step,
+                                    error_reason: response.error.reason
                                 }
                             });
                         } catch (e) { console.error("Failed to report failure:", e); }
+                    });
 
-                    } else if (result.paymentDetails) {
-                        // RE-OPEN Status Modal to show progress
-                        await openStatusModal('processing', 'Verifying payment...');
+                    rzp.open();
+                    await closeDossierModal();
+                    await closeStatusModal();
 
-                        try {
-                            // 5. Verify Payment
-                            await $fetch("/api/complete-payment", {
-                                method: "POST",
-                                body: {
-                                    cf_order_id: res.cf_order_id
-                                }
-                            });
-
-                            // 6. Create Student Account after successful payment
-                            processingMessage.value = 'Creating your account...';
-                            try {
-                                const studentRes: any = await $fetch(
-                                    `${config.public.apiBase}/api/users/create_student/`,
-                                    {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: {
-                                            "full_name": form.name,
-                                            "email": form.email,
-                                            "city": form.city,
-                                            "state": form.state,
-                                            "country": "India",
-                                            "phone1": form.phone
-                                        },
-                                    }
-                                );
-
-                                if (studentRes.success && studentRes.data?.password) {
-                                    await autoLogin(form.email, studentRes.data.password, res.cf_order_id);
-                                } else {
-                                    // Fallback success state if registration fails but payment was done
-                                    paymentStatus.value = 'success';
-                                    paymentId.value = res.cf_order_id;
-                                    processingMessage.value = 'Payment Successful! Redirecting to profile...';
-                                    resetForm();
-                                    // setTimeout(() => {
-                                    //     window.location.href = '/profile';
-                                    // }, 3000);
-                                }
-                            } catch (regErr: any) {
-                                console.error("[PAYMENT] Registration error after payment:", regErr);
-                                paymentStatus.value = 'success';
-                                paymentId.value = res.cf_order_id;
-                                processingMessage.value = 'Payment Successful! Redirecting to profile...';
-                                // setTimeout(() => {
-                                //     window.location.href = '/profile';
-                                // }, 3000);
-                            }
-
-                        } catch (e) {
-                            await closeStatusModal();
-                            console.error("[PAYMENT] complete-payment error:", e);
-                            showAlert('Payment Error', 'Payment verification failed. Please contact support.', 'error');
-                        }
+                } else {
+                    // DEFAULT: CASHFREE
+                    // 3. Load Cashfree JS SDK
+                    const loaded = await loadCashfreeScript();
+                    if (!loaded || !(window as any).Cashfree) {
+                        await closeStatusModal();
+                        alert("Cashfree SDK failed to load");
+                        return;
                     }
-                });
+
+                    // 4. Open Cashfree Checkout
+                    const cfMode = res.environment === 'PRODUCTION' ? 'production' : 'sandbox';
+                    const cashfree = (window as any).Cashfree({ mode: cfMode });
+
+                    cashfree.checkout({
+                        paymentSessionId: res.payment_session_id,
+                        redirectTarget: "_modal"
+                    }).then(async (result: any) => {
+                        restoreBodyScroll();
+                        await closeStatusModal(); // Close "Initializing..." modal
+
+                        if (result.error) {
+                            console.error("[PAYMENT] Cashfree error:", result.error);
+                            try {
+                                await $fetch("/api/report-payment-failure", {
+                                    method: "POST",
+                                    body: {
+                                        cf_order_id: res.cf_order_id,
+                                        cf_payment_id: result.error?.payment_id || null,
+                                        error_code: result.error?.code,
+                                        error_description: result.error?.message,
+                                        error_source: result.error?.source
+                                    }
+                                });
+                            } catch (e) { console.error("Failed to report failure:", e); }
+
+                        } else if (result.paymentDetails) {
+                            // RE-OPEN Status Modal to show progress
+                            await openStatusModal('processing', 'Verifying payment...');
+
+                            try {
+                                // 5. Verify Payment
+                                await $fetch("/api/complete-payment", {
+                                    method: "POST",
+                                    body: {
+                                        cf_order_id: res.cf_order_id
+                                    }
+                                });
+                                await postPaymentSuccess(res.cf_order_id);
+                                await closeDossierModal();
+                            } catch (e) {
+                                await closeStatusModal();
+                                console.error("[PAYMENT] complete-payment error:", e);
+                                showAlert('Payment Error', 'Payment verification failed. Please contact support.', 'error');
+                            }
+                        }
+                    });
+                }
 
             } catch (err) {
                 await closeStatusModal();
@@ -714,6 +795,9 @@ export default defineComponent({
             if (el) {
                 el.addEventListener('show.bs.modal', resetForm);
             }
+            // Populate states from local JSON and sort alphabetically
+            const statesArr = Object.keys(stateCityData);
+            states.value = statesArr.sort((a, b) => a.localeCompare(b));
         });
 
         return {
