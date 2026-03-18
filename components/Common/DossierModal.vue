@@ -344,7 +344,7 @@ export default defineComponent({
                     phone: form.phone,
                     state: form.state,
                     city: form.city,
-                    source: 2,
+                    source: 3,
                     source_form: props.mode === 'apply' ? 1 : 2,
                 };
                 const config = useRuntimeConfig();
