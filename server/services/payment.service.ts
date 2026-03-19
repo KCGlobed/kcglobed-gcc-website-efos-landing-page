@@ -33,7 +33,7 @@ export async function savePayment(data: any) {
     data.status || 'success',
     data.response,
     data.form_id,
-    config.source || 3
+    Number(config.source)
   ];
 
   const result = await pool.query(query, values);
