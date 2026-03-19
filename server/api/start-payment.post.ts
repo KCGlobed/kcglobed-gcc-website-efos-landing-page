@@ -14,7 +14,9 @@ export default defineEventHandler(async (event) => {
         timestamp: new Date().toISOString()
     });
 
-    const amount = Number(config.cashfreePaymentAmount || process.env.CASHFREE_PAYMENT_AMOUNT || 2950);
+    const amount = activeGateway === 'RAZORPAY'
+        ? Number(config.razorpayAmount || 2950)
+        : Number(config.cashfreePaymentAmount || 2950);
     const currency = 'INR';
 
     if (activeGateway === 'RAZORPAY') {

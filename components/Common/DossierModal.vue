@@ -337,6 +337,7 @@ export default defineComponent({
             isSubmitting.value = true;
 
             try {
+                const config = useRuntimeConfig();
                 // Prepare payload for API
                 const payload = {
                     full_name: form.name,
@@ -344,10 +345,9 @@ export default defineComponent({
                     phone: form.phone,
                     state: form.state,
                     city: form.city,
-                    source: 2,
+                    source: config.public.source || 2,
                     source_form: props.mode === 'apply' ? 1 : 2,
                 };
-                const config = useRuntimeConfig();
 
                 // ── Pre-Dossier Email Validation ──
                 try {

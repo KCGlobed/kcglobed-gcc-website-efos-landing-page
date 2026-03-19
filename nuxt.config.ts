@@ -44,6 +44,7 @@ export default defineNuxtConfig({
   ],
   modules: ["@bootstrap-vue-next/nuxt", "nuxt-swiper", "nuxt-aos"],
   runtimeConfig: {
+    source: process.env.SOURCE || '2',
 
     // ── Razorpay (disabled – kept for reference) ──────────────────────────────
     razorpayKeyId: process.env.RAZORPAY_KEY_ID,
@@ -70,6 +71,7 @@ export default defineNuxtConfig({
     emailPassword: process.env.EMAIL_HOST_PASSWORD,
 
     public: {
+      source: process.env.SOURCE || '2',
       paymentGateway: process.env.PAYMENT_GATEWAY || 'RAZORPAY',
       paymentAmount: process.env.PAYMENT_AMOUNT,
       apiBase: process.env.NUXT_PUBLIC_API_BASE,

@@ -71,7 +71,10 @@ export default defineEventHandler(async (event) => {
     let userName = '';
     let userEmail = '';
     let userMobile = '';
-    let amount = Number(config.cashfreePaymentAmount || process.env.CASHFREE_PAYMENT_AMOUNT || 2950);
+    const activeGateway = config.paymentGateway || 'RAZORPAY';
+    let amount = activeGateway === 'RAZORPAY'
+        ? Number(config.razorpayAmount || 2950)
+        : Number(config.cashfreePaymentAmount || 2950);
     let currency = 'INR';
 
     if (cashfree) {
