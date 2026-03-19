@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     const amount = activeGateway === 'RAZORPAY' 
         ? Number(config.razorpayAmount || 2950)
         : Number(config.cashfreePaymentAmount || 2950);
-    const currency = 'INR';
+    const currency = config.razorpayCurrency || 'INR';
 
     if (activeGateway === 'RAZORPAY') {
         try {
