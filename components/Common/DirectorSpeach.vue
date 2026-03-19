@@ -42,10 +42,17 @@
 
                 <div class="col-lg-6 col-md-12 mt-5 mt-lg-0">
                     <div class="video-box-wrapper" data-aos="fade-left">
-                        <div class="video-preview-box shadow-lg">
-                            <img src="https://storage.googleapis.com/static_files_backend/media/images/manna%20sir%20thmbnl%20(1).jpg"
+                        <div class="video-preview-box shadow-lg" @click="playVideo">
+                            <video ref="directorVideo" v-show="isVideoPlaying" :controls="isVideoPlaying"
+                                controlsList="nodownload" @contextmenu.prevent class="preview-img">
+                                <source
+                                    src="https://storage.googleapis.com/gcc_static_files_backend/static/videos/MANNA%20SIR%20WEBSITE_FINAL%20100.mp4"
+                                    type="video/mp4" />
+                            </video>
+                            <img v-show="!isVideoPlaying"
+                                src="https://storage.googleapis.com/gcc_static_files_backend/static/images/manna%20sir%20thmbnl.jpg"
                                 alt="ED Message Video Preview" class="preview-img">
-                            <div class="play-btn-wrap">
+                            <div v-show="!isVideoPlaying" class="play-btn-wrap">
                                 <div class="play-btn">
                                     <i class="ti ti-player-play-filled"></i>
                                 </div>
@@ -63,7 +70,17 @@
 </template>
 
 <script setup lang="ts">
-// Logic for video modal if needed later
+import { ref } from 'vue';
+
+const isVideoPlaying = ref(false);
+const directorVideo = ref<HTMLVideoElement | null>(null);
+
+const playVideo = () => {
+    if (directorVideo.value) {
+        directorVideo.value.play();
+        isVideoPlaying.value = true;
+    }
+};
 </script>
 
 <style scoped>
@@ -156,22 +173,23 @@
 }
 
 .play-btn {
-    width: 80px;
-    height: 80px;
-    background-color: #ffffff;
+    width: 90px;
+    height: 90px;
+    background-color: #A13E99;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 30px;
-    color: #fc6441;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    font-size: 32px;
+    color: #ffffff;
+    box-shadow: 0 0 0 0 rgba(161, 62, 153, 0.4);
+    animation: pulse-play 2s infinite;
     transition: all 0.3s ease;
 }
 
 .video-preview-box:hover .play-btn {
     transform: scale(1.1);
-    background-color: #fc6441;
+    background-color: #C436BE;
     color: #ffffff;
 }
 
@@ -233,6 +251,22 @@
 
     .title {
         text-align: center;
+    }
+}
+@keyframes pulse-play {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(161, 62, 153, 0.7);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 20px rgba(161, 62, 153, 0);
+    }
+
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(161, 62, 153, 0);
     }
 }
 </style>
