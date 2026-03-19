@@ -345,7 +345,7 @@ export default defineComponent({
                         phone: form.phone,
                         state: form.state,
                         city: form.city,
-                        source: config.public.source || 3,
+                        source: config.public.source || 4,
                         source_form: props.mode === 'apply' ? 1 : 2,
                     };
 

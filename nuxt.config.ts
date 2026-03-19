@@ -44,7 +44,7 @@ export default defineNuxtConfig({
   ],
   modules: ["@bootstrap-vue-next/nuxt", "nuxt-swiper", "nuxt-aos"],
   runtimeConfig: {
-    source: process.env.SOURCE || '3',
+    source: process.env.SOURCE || '4',
 
     // ── Razorpay (disabled – kept for reference) ──────────────────────────────
     razorpayKeyId: process.env.RAZORPAY_KEY_ID,
@@ -75,7 +75,7 @@ export default defineNuxtConfig({
       paymentAmount: process.env.PAYMENT_GATEWAY === 'CASHFREE'
         ? process.env.CASHFREE_PAYMENT_AMOUNT
         : process.env.RAZORPAY_PAYMENT_AMOUNT,
-      source: process.env.SOURCE || '2',
+      source: process.env.SOURCE || '4',
       apiBase: process.env.NUXT_PUBLIC_API_BASE,
       nfetDates: process.env.NUXT_PUBLIC_NFET_DATES || '',
       nfetSlots: process.env.NUXT_PUBLIC_NFET_SLOTS || '',
