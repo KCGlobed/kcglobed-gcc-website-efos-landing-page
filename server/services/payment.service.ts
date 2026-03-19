@@ -21,6 +21,7 @@ export async function savePayment(data: any) {
     RETURNING id
   `;
 
+  const config = useRuntimeConfig();
   const values = [
     data.form_type ?? null,
     data.form_id ?? null,
@@ -32,7 +33,7 @@ export async function savePayment(data: any) {
     data.status || 'success',
     data.response,
     data.form_id,
-    3
+    config.source || 3
   ];
 
   const result = await pool.query(query, values);

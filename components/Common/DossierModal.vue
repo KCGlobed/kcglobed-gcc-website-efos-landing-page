@@ -334,20 +334,20 @@ export default defineComponent({
         const submitForm = async () => {
             if (!validateForm()) return;
 
-            isSubmitting.value = true;
-
-            try {
-                // Prepare payload for API
-                const payload = {
-                    full_name: form.name,
-                    email: form.email,
-                    phone: form.phone,
-                    state: form.state,
-                    city: form.city,
-                    source: 3,
-                    source_form: props.mode === 'apply' ? 1 : 2,
-                };
+                isSubmitting.value = true;
                 const config = useRuntimeConfig();
+
+                try {
+                    // Prepare payload for API
+                    const payload = {
+                        full_name: form.name,
+                        email: form.email,
+                        phone: form.phone,
+                        state: form.state,
+                        city: form.city,
+                        source: config.public.source || 3,
+                        source_form: props.mode === 'apply' ? 1 : 2,
+                    };
 
                 // ── Pre-Dossier Email Validation ──
                 try {
