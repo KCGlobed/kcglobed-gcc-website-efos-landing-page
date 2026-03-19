@@ -59,8 +59,20 @@ export default defineEventHandler(async (event) => {
     let userName = '';
     let userEmail = '';
     let userMobile = '';
-    let amount = Number(config.public?.paymentAmount || 2950);
-    let currency = config.razorpayCurrency || 'INR';
+    let amount = Number(
+        process.env.RAZORPAY_PAYMENT_AMOUNT || 
+        process.env.CASHFREE_PAYMENT_AMOUNT || 
+        config.public?.paymentAmount || 
+        2950
+    );
+
+    console.log(`[PAYMENT][failure][debug] Runtime Amount Resolution:`, {
+        env_RAZORPAY_PAYMENT_AMOUNT: process.env.RAZORPAY_PAYMENT_AMOUNT,
+        env_CASHFREE_PAYMENT_AMOUNT: process.env.CASHFREE_PAYMENT_AMOUNT,
+        config_public_paymentAmount: config.public?.paymentAmount,
+        resolved_amount: amount
+    });
+    let currency = process.env.RAZORPAY_CURRENCY || config.razorpayCurrency || 'INR';
 
     // ── Step 1: Try to fetch order context (best-effort) ────────
     if (gateway === 'cashfree') {
