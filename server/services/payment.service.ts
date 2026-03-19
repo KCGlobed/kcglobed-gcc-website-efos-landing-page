@@ -22,6 +22,16 @@ export async function savePayment(data: any) {
   `;
 
   const config = useRuntimeConfig();
+  const sourceValue = process.env.SOURCE || process.env.NUXT_PUBLIC_SOURCE || config.source;
+  
+  console.log(`[PAYMENT][service] Saving payment with source:`, {
+    sourceValue,
+    env_SOURCE: process.env.SOURCE,
+    env_NUXT_PUBLIC_SOURCE: process.env.NUXT_PUBLIC_SOURCE,
+    config_source: config.source,
+    timestamp: new Date().toISOString()
+  });
+
   const values = [
     data.form_type ?? null,
     data.form_id ?? null,
@@ -33,7 +43,7 @@ export async function savePayment(data: any) {
     data.status || 'success',
     data.response,
     data.form_id,
-    Number(config.source)
+    Number(sourceValue || 1)
   ];
 
   const result = await pool.query(query, values);
