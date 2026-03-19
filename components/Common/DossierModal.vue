@@ -520,15 +520,15 @@ export default defineComponent({
                     }
                 );
 
-                if (studentRes.success && studentRes.data?.password) {
-                    await autoLogin(form.email, studentRes.data.password, pid);
-                } else {
+                // if (studentRes.success && studentRes.data?.password) {
+                    // await autoLogin(form.email, studentRes.data.password, pid);
+                // } else {
                     // Fallback success state if registration fails but payment was done
                     paymentStatus.value = 'success';
                     paymentId.value = pid;
                     processingMessage.value = 'Payment Successful!';
                     resetForm();
-                }
+                // }
             } catch (regErr: any) {
                 console.error("[PAYMENT] Registration error after payment:", regErr);
                 paymentStatus.value = 'success';
