@@ -23,7 +23,6 @@ export async function savePayment(data: any) {
 
   const config = useRuntimeConfig();
   const sourceValue = process.env.SOURCE || process.env.NUXT_PUBLIC_SOURCE || config.source;
-  
   console.log(`[PAYMENT][service] Saving payment with source:`, {
     sourceValue,
     env_SOURCE: process.env.SOURCE,
