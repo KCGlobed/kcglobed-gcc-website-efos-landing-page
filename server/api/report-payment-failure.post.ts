@@ -1,20 +1,17 @@
-// ── CASHFREE: active (cashfree-pg v5) ────────────────────────────────────────
 import { createCashfreeInstance } from "../utils/cashfree";
+import { createRazorpayInstance } from "../utils/razorpay";
 import { savePayment } from "../services/payment.service";
 import { sendPaymentFailureEmail } from "../services/email.service";
 
 // Helper: extract form_id from order_id string (e.g. "cf_322_1772694830212" → "322")
 function extractFormIdFromOrderId(orderId: string): string | null {
     const parts = orderId.split('_');
-    if (parts.length >= 3) {
+    if (parts.length >= 2) {
         const extracted = parts[1];
-        if (extracted && extracted !== 'guest' && extracted !== 'null') return extracted;
+        if (extracted && extracted !== 'guest' && extracted !== 'null' && !isNaN(Number(extracted))) return extracted;
     }
     return null;
 }
-
-// ── RAZORPAY: disabled (kept for reference) ───────────────────────────────────
-// import Razorpay from "razorpay";
 
 export default defineEventHandler(async (event) => {
     const body = await readBody(event);
@@ -22,11 +19,14 @@ export default defineEventHandler(async (event) => {
     // ── CASHFREE fields ───────────────────────────────────────────────────────
     const { cf_order_id, cf_payment_id, error_code, error_description, error_source, error_step, error_reason } = body;
 
-    // ── RAZORPAY fields (disabled) ────────────────────────────────────────────
-    // const { razorpay_order_id, razorpay_payment_id } = body;
+    // ── RAZORPAY fields ───────────────────────────────────────────────────────
+    const { razorpay_order_id, razorpay_payment_id } = body;
 
-    if (!cf_order_id) {
-        console.error("[PAYMENT][failure] FAILED — Missing cf_order_id in failure report", {
+    const orderId = cf_order_id || razorpay_order_id;
+    const paymentId = cf_payment_id || razorpay_payment_id;
+
+    if (!orderId) {
+        console.error("[PAYMENT][failure] FAILED — Missing order ID in failure report", {
             event: "client_reported_failure",
             reason: "missing_order_id",
             timestamp: new Date().toISOString()
@@ -37,9 +37,9 @@ export default defineEventHandler(async (event) => {
     // --- LOG: Client Reported Failure (received) ---
     console.log("[PAYMENT][failure] Client reported a payment failure", {
         event: "client_reported_failure_received",
-        gateway: "cashfree",
-        cf_order_id,
-        cf_payment_id: cf_payment_id || null,
+        gateway: razorpay_order_id ? "razorpay" : "cashfree",
+        order_id: orderId,
+        payment_id: paymentId || null,
         error_code: error_code || null,
         error_description: error_description || null,
         error_source: error_source || null,
@@ -52,14 +52,26 @@ export default defineEventHandler(async (event) => {
 
     // ── CASHFREE: Initialize SDK ──────────────────────────────────────────────
     let cashfree: ReturnType<typeof createCashfreeInstance>["instance"] | null = null;
-    try {
-        const cf = createCashfreeInstance(config, event);
-        cashfree = cf.instance;
-    } catch (e: any) {
-        console.warn("[PAYMENT][failure] Cashfree config error — will save failure without order context", {
-            reason: e.message, cf_order_id
-        });
-        // Don't throw — we still want to save the failure record below
+    if (cf_order_id) {
+        try {
+            const cf = createCashfreeInstance(config, event);
+            cashfree = cf.instance;
+        } catch (e: any) {
+            console.warn("[PAYMENT][failure] Cashfree config error — will save failure without order context", {
+                reason: e.message, order_id: orderId
+            });
+        }
+    }
+
+    // ── RAZORPAY: Initialize SDK ──────────────────────────────────────────────
+    let razorpay: any = null;
+    if (razorpay_order_id) {
+        try {
+            const rz = createRazorpayInstance(config);
+            razorpay = rz.instance;
+        } catch (e: any) {
+            console.warn("[PAYMENT][failure] Razorpay config error", { reason: e.message, order_id: orderId });
+        }
     }
 
     // ── Step 1: Try to fetch order context from Cashfree (best-effort) ────────
@@ -77,7 +89,7 @@ export default defineEventHandler(async (event) => {
         : Number(config.cashfreePaymentAmount || 2950);
     let currency = 'INR';
 
-    if (cashfree) {
+    if (cashfree && cf_order_id) {
         try {
             const orderRes = await cashfree.PGFetchOrder(cf_order_id);
             const orderData = orderRes.data;
@@ -121,6 +133,37 @@ export default defineEventHandler(async (event) => {
         }
     }
 
+    // ── Step 1b: Try to fetch order context from Razorpay (best-effort) ───────
+    if (razorpay && razorpay_order_id) {
+        try {
+            const orderData = await razorpay.orders.fetch(razorpay_order_id);
+
+            amount = (orderData.amount / 100) || amount; // Razorpay stores in paisa
+            currency = orderData.currency || currency;
+
+            if (orderData.notes) {
+                userId = orderData.notes.user_id || userId;
+                formType = orderData.notes.form_type || formType;
+                formId = orderData.notes.form_id || formId;
+                userName = orderData.notes.name || userName;
+                userEmail = orderData.notes.email || userEmail;
+                userMobile = orderData.notes.mobile || userMobile;
+            }
+
+            // Fallback: extract form_id from order_id if not in notes (rare)
+            if (!formId) {
+                formId = extractFormIdFromOrderId(razorpay_order_id);
+            }
+
+        } catch (fetchError: any) {
+            console.warn("[PAYMENT][failure] Could not fetch Razorpay order context", {
+                razorpay_order_id,
+                error_message: fetchError?.message || "Unknown error",
+                timestamp: new Date().toISOString()
+            });
+        }
+    }
+
     // ── Step 2: Always save the failure record to DB ──────────────────────────
     // This runs regardless of whether order fetch succeeded or failed.
     try {
@@ -128,22 +171,22 @@ export default defineEventHandler(async (event) => {
             student_id: userId || null,
             form_type: formType || 1,
             form_id: formId,
-            razorpay_order_id: cf_order_id,
-            razorpay_payment_id: cf_payment_id || 'N/A',
+            razorpay_order_id: orderId,
+            razorpay_payment_id: paymentId || 'N/A',
             razorpay_signature: 'N/A',
             amount,
             currency,
             status: "failed",
-            response: JSON.stringify({ ...body, source: "client_report", gateway: "cashfree" })
+            response: JSON.stringify({ ...body, source: "client_report", gateway: razorpay_order_id ? "razorpay" : "cashfree" })
         });
 
         // --- LOG: Failure Recorded Successfully ---
         console.log("[PAYMENT][failure] RECORDED — Client failure saved to DB", {
             event: "client_reported_failure",
             status: "failed",
-            gateway: "cashfree",
-            cf_order_id,
-            cf_payment_id: cf_payment_id || 'N/A',
+            gateway: razorpay_order_id ? "razorpay" : "cashfree",
+            order_id: orderId,
+            payment_id: paymentId || 'N/A',
             amount, currency,
             user_id: userId, name: userName, email: userEmail, mobile: userMobile,
             form_type: formType, form_id: formId,
@@ -184,9 +227,9 @@ export default defineEventHandler(async (event) => {
     } catch (saveError: any) {
         console.error("[PAYMENT][failure] ERROR — Could not save failure record to DB", {
             event: "client_report_save_error",
-            gateway: "cashfree",
-            cf_order_id,
-            cf_payment_id: cf_payment_id || null,
+            gateway: razorpay_order_id ? "razorpay" : "cashfree",
+            order_id: orderId,
+            payment_id: paymentId || null,
             error_message: saveError?.message || saveError,
             timestamp: new Date().toISOString()
         });

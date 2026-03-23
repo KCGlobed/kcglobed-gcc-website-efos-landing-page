@@ -585,14 +585,7 @@
 <script lang="ts">
 import { defineComponent, ref, reactive, nextTick, defineAsyncComponent, onMounted, watch } from "vue";
 
-const headers = new Headers();
-headers.append("X-CSCAPI-KEY", "Q3k5SXFtVjNubXRBZjdKRFJ1QVJLQkZqQ3lYT2JNVUhVZmhOYm5ESw==");
-
-const requestOptions: RequestInit = {
-    method: 'GET',
-    headers: headers,
-    redirect: 'follow'
-};
+import stateCityData from '~/state_city.json';
 
 import image1 from "../../assets/img/heros/hero_bg.svg";
 import gccPdf from "../../assets/gcc.pdf";
@@ -762,32 +755,20 @@ export default defineComponent({
             form.city = "";
         };
 
-        watch(() => form.state, async (newState) => {
+        watch(() => form.state, (newState) => {
             if (!newState) {
                 citiesList.value = [];
                 return;
             }
-            try {
-                const res = await fetch(
-                    `https://api.countrystatecity.in/v1/countries/IN/states/${newState}/cities`,
-                    requestOptions
-                );
-                citiesList.value = await res.json();
-            } catch (error) {
-                console.error("Failed to load cities", error);
-            }
+            // Populate cities from local JSON and sort alphabetically
+            const cities = (stateCityData as any)[newState] || [];
+            citiesList.value = [...cities].sort((a, b) => a.localeCompare(b));
         });
 
-        onMounted(async () => {
-            try {
-                const res = await fetch(
-                    "https://api.countrystatecity.in/v1/countries/IN/states",
-                    requestOptions
-                );
-                states.value = await res.json();
-            } catch (error) {
-                console.error("Failed to load states", error);
-            }
+        onMounted(() => {
+            // Populate states from local JSON and sort alphabetically
+            const statesArr = Object.keys(stateCityData);
+            states.value = statesArr.sort((a, b) => a.localeCompare(b));
         });
 
         const validateForm = () => {
