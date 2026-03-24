@@ -3,6 +3,7 @@ import { pool } from '../utils/db';
 export async function savePayment(data: any) {
   const query = `
     INSERT INTO payments (
+      re_attempt_status,
       form_type,
       form_id,
       razorpay_order_id,
@@ -16,13 +17,14 @@ export async function savePayment(data: any) {
       source
     )
     VALUES (
-      $1, $2, $3, $4, $5, $6, $7, $8, $9,$10,$11
+      $1, $2, $3, $4, $5, $6, $7, $8, $9,$10,$11,$12
     )
     RETURNING id
   `;
 
   const config = useRuntimeConfig();
   const values = [
+    false,
     data.form_type ?? null,
     data.form_id ?? null,
     data.razorpay_order_id,
