@@ -3,7 +3,7 @@ import { pool } from '../utils/db';
 export async function savePayment(data: any) {
   const query = `
     INSERT INTO payments (
-      re_attempt_status
+      re_attempt_status,
       form_type,
       form_id,
       razorpay_order_id,
