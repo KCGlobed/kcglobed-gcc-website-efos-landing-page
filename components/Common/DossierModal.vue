@@ -216,6 +216,7 @@ export default defineComponent({
             paymentStatus.value = status;
             processingMessage.value = message;
             paymentId.value = pid;
+            console.log(status, message, pid, '----pid,=')
             await nextTick();
             const el = document.getElementById(statusModalId);
             if (el) {
@@ -519,16 +520,13 @@ export default defineComponent({
                         },
                     }
                 );
+                // Fallback success state if registration fails but payment was done
+                paymentStatus.value = 'success';
+                paymentId.value = pid;
+                processingMessage.value = 'Payment Successful!';
+                await openStatusModal('success', 'Payment Successful!', pid);
+                resetForm();
 
-                if (studentRes.success && studentRes.data?.password) {
-                    await autoLogin(form.email, studentRes.data.password, pid);
-                } else {
-                    // Fallback success state if registration fails but payment was done
-                    paymentStatus.value = 'success';
-                    paymentId.value = pid;
-                    processingMessage.value = 'Payment Successful!';
-                    resetForm();
-                }
             } catch (regErr: any) {
                 console.error("[PAYMENT] Registration error after payment:", regErr);
                 paymentStatus.value = 'success';
@@ -545,43 +543,6 @@ export default defineComponent({
                     restoreBodyScroll();
                 }, 300); // 300ms accounts for standard bootstrap transition
             });
-        };
-
-        const autoLogin = async (email: string, password: string, pid: string = '') => {
-            try {
-                processingMessage.value = 'Signing you in...';
-                const config = useRuntimeConfig();
-                const response: any = await $fetch(
-                    `${config.public.apiBase}/api/users/website_login/`,
-                    {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: {
-                            email: email,
-                            password: password,
-                            role: 'student',
-                        },
-                    }
-                );
-
-                if (response.data?.token) {
-                    const { access, refresh } = response.data.token;
-                    const user_role = response.data.user_role ?? null;
-                    const user_id = response.data.user_id ?? null;
-
-                    auth.login({ access, refresh, user_role, user_id });
-
-                    // Show final success state in the modal
-                    paymentStatus.value = 'success';
-                    paymentId.value = pid;
-                    processingMessage.value = 'Successfully registered!';
-                    resetForm();
-                }
-            } catch (err: any) {
-                await closeStatusModal();
-                console.error('[AutoLogin] Error:', err);
-                showAlert('Login Failed', 'Account created but automatic login failed. Please login manually.', 'error');
-            }
         };
 
         const handlePayment = async () => {
