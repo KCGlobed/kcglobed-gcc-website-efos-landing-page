@@ -63,7 +63,7 @@ export default defineNuxtConfig({
 
     // ── Payment Gateway Selector ──────────────────────────────────────────────
     // 'CASHFREE' or 'RAZORPAY'
-    paymentGateway: process.env.PAYMENT_GATEWAY || 'RAZORPAY',
+    paymentGateway: process.env.PAYMENT_GATEWAY || 'CASHFREE',
 
     // ── Email ─────────────────────────────────────────────────────────────────
     emailHost: process.env.EMAIL_HOST,
@@ -71,7 +71,7 @@ export default defineNuxtConfig({
     emailPassword: process.env.EMAIL_HOST_PASSWORD,
 
     public: {
-      paymentGateway: process.env.NUXT_PUBLIC_PAYMENT_GATEWAY || process.env.PAYMENT_GATEWAY || 'RAZORPAY',
+      paymentGateway: process.env.NUXT_PUBLIC_PAYMENT_GATEWAY || process.env.PAYMENT_GATEWAY || 'CASHFREE',
       paymentAmount: process.env.RAZORPAY_PAYMENT_AMOUNT || process.env.CASHFREE_PAYMENT_AMOUNT || process.env.NUXT_PUBLIC_PAYMENT_AMOUNT || '2950',
       source: process.env.NUXT_PUBLIC_SOURCE || process.env.SOURCE,
       apiBase: process.env.NUXT_PUBLIC_API_BASE,
