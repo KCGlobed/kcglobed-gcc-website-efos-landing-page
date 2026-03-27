@@ -3,10 +3,15 @@
     'navbar top-navbar first-navbar',
     { sticky: isSticky },
   ]">
-    <div class="container-fluid justify-content-center">
+    <div class="container-fluid d-flex justify-content-between align-items-center px-4">
       <NuxtLink class="navbar-brand m-0" to="/">
-        <img src="~/assets/Logo/Logo/GCC-School-Logo-White.jpeg" alt="Logo" style="height: 75px;" />
+        <img src="~/assets/Logo/Logo/GCC-School-Logo-White.jpeg" alt="GCC School Logo" class="gcc-logo" />
       </NuxtLink>
+
+      <a v-show="config.public.jointBrandLogo" :href="config.public.brandRedirectionLink" target="_blank"
+        class="joint-brand-link">
+        <img :src="config.public.jointBrandLogo" alt="Joint Brand Logo" class="brand-logo" />
+      </a>
     </div>
   </nav>
 </template>
@@ -14,6 +19,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, watch, nextTick } from "vue";
 import { useRouter } from "vue-router";
+import { useRuntimeConfig } from "#app";
 import stateStore from "../../utils/store";
 
 interface SearchResult {
@@ -27,6 +33,7 @@ export default defineComponent({
   name: "MainNavbar",
   setup() {
     const router = useRouter();
+    const config = useRuntimeConfig();
     const isSticky = ref(false);
     const isSearchVisible = ref(false);
     const searchQuery = ref("");
@@ -189,6 +196,7 @@ export default defineComponent({
       filteredResults,
       quickLinks,
       stateStoreInstance,
+      config,
       toggleSearch,
       closeSearch,
       onSearchInput,
@@ -207,9 +215,63 @@ export default defineComponent({
 </script>
 
 <style>
+
+.container-fluid {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-brand {
+  margin-right: auto;
+}
+
+.joint-brand-link {
+  margin-left: auto;
+}
 .navbar {
   background-color: #020103;
-  max-height: 90px;
+  min-height: 90px;
+}
+
+.gcc-logo {
+  height: 75px;
+  width: auto;
+}
+
+.brand-logo {
+  height: 60px;
+  width: auto;
+  max-width: 200px;
+  object-fit: contain;
+}
+
+.logo-navigation-area {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin: 0 !important;
+}
+
+.joint-brand-link {
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .gcc-logo {
+    height: 50px;
+  }
+
+  .brand-logo {
+    height: 40px;
+  }
+
+  .navbar {
+    min-height: 70px;
+  }
 }
 
 .navbar .navbar-nav .nav-item .nav-link {

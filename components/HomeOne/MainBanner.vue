@@ -6,7 +6,7 @@
     }" :modules="[SwiperEffectFade, SwiperPagination]" class="hero-slider">
       <SwiperSlide v-for="banner in banners" :key="banner.id">
         <div class="hero-slider-warp" :style="{
-          'background-image': `url(${banner.image})`,
+          'background-image': `url(${config.public.jointBrandHomeBanner})`,
         }">
           <div class="container-fluid">
             <div class="row align-items-center">
@@ -213,7 +213,7 @@
               <input v-model="form.graduationProgramOther" class="form-control" placeholder="Please specify">
               <label>Please specify your graduation program</label>
               <small class="text-danger" v-if="errors.graduationProgramOther">{{ errors.graduationProgramOther
-              }}</small>
+                }}</small>
             </div>
 
             <!-- Graduation Status -->
@@ -663,13 +663,16 @@
 import { defineComponent } from "vue";
 
 import image1 from "../../assets/img/heros/hero_bg.svg";
-import image2 from "../../assets/img/heros/hero2.jpg";
 import gccPdf from "../../assets/gcc.pdf";
 import universities from "../../assets/universities.json";
-
+import { useRuntimeConfig } from "#app";
 export default defineComponent({
 
   name: "MainBanner",
+  setup() {
+    const config = useRuntimeConfig();
+    return { config }
+  },
   methods: {
     validateForm() {
       this.errors = {

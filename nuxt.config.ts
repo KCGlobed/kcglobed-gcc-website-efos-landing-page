@@ -78,6 +78,10 @@ export default defineNuxtConfig({
       nfetDates: process.env.NUXT_PUBLIC_NFET_DATES || '',
       nfetSlots: process.env.NUXT_PUBLIC_NFET_SLOTS || '',
       nfetSlotBufferHours: process.env.NUXT_PUBLIC_NFET_SLOT_BUFFER_HOURS || '48',
+      jointBrandLogo: process.env.JOINT_BRAND_LOGO || '',
+      brandRedirectionLink: process.env.BRAND_REDIRECTION_LINK || '#',
+      jointBrandHomeBanner:process.env.HOME_BANNER_FOR_JOINT_COLLAB
+
     }
   },
   plugins: ["~/plugins/scrollReveal.ts"],
