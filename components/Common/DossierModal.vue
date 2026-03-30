@@ -57,16 +57,24 @@
                             </div>
                         </div>
 
-                        <div class="mb-4">
+                        <div v-if="mode === 'apply'" class="mb-4">
                             <div class="form-check custom-checkbox">
-                                <input class="form-check-input" type="checkbox" v-model="form.isCommerceGraduate"
-                                    id="commerceCheck">
-                                <label class="form-check-label small text-muted" for="commerceCheck">
-                                    Yes , I am commerce graduate with first division.*
+                                <input class="form-check-input" type="checkbox" v-model="form.isAgreed" id="termsCheck">
+                                <label class="form-check-label small text-muted" for="termsCheck">
+                                    By submitting, you agree to our
+                                    <NuxtLink to="/terms-conditions" class="text-purple text-decoration-none fw-bold"
+                                        @click="handleNavigation">
+                                        Terms
+                                    </NuxtLink>
+                                    and
+                                    <NuxtLink to="/privacy-policy" class="text-purple text-decoration-none fw-bold"
+                                        @click="handleNavigation">
+                                        Privacy
+                                        Policy</NuxtLink>*
                                 </label>
                             </div>
-                            <small class="text-danger d-block mt-1" v-if="errors.isCommerceGraduate">{{
-                                errors.isCommerceGraduate }}</small>
+                            <small class="text-danger d-block mt-1" v-if="errors.isAgreed">{{
+                                errors.isAgreed }}</small>
                         </div>
 
                         <!-- Apply mode: single PAY NOW submit button -->
@@ -79,28 +87,48 @@
                         <!-- Dossier mode: DOWNLOAD NOW first, then PAY NOW -->
                         <template v-else>
                             <button v-if="!isDownloaded" type="submit"
-                                class="btn btn-register w-100 py-3 fw-bold text-uppercase" :disabled="isSubmitting">
+                                class="btn btn-register w-100 py-3 mt-2 fw-bold text-uppercase"
+                                :disabled="isSubmitting">
                                 <span v-if="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
                                 {{ isSubmitting ? 'Processing...' : 'DOWNLOAD NOW' }}
                             </button>
 
-                            <button v-else type="button" @click="handlePayment"
-                                class="btn btn-register w-100 py-3 fw-bold text-uppercase"
-                                :disabled="isPaymentInProgress">
-                                <span v-if="isPaymentInProgress" class="spinner-border spinner-border-sm me-2"></span>
-                                {{ isPaymentInProgress ? 'Opening Payment...' : 'PAY NOW' }}
-                            </button>
+                            <template v-else>
+                                <!-- Checkbox + Disclaimer before PAY NOW -->
+                                <div class="mb-3 mt-3">
+                                    <div class="form-check custom-checkbox">
+                                        <input class="form-check-input" type="checkbox" v-model="form.isAgreed"
+                                            id="termsCheckDossier">
+                                        <label class="form-check-label small text-muted" for="termsCheckDossier">
+                                            By submitting, you agree to our
+                                            <NuxtLink to="/terms-conditions"
+                                                class="text-purple text-decoration-none fw-bold"
+                                                @click="handleNavigation">
+                                                Terms
+                                            </NuxtLink>
+                                            and
+                                            <NuxtLink to="/privacy-policy"
+                                                class="text-purple text-decoration-none fw-bold"
+                                                @click="handleNavigation">
+                                                Privacy
+                                                Policy</NuxtLink>
+                                        </label>
+                                    </div>
+                                    <small class="text-danger d-block mt-1" v-if="errors.isAgreed">{{
+                                        errors.isAgreed }}</small>
+                                </div>
+
+                                <button type="button" @click="handlePayment"
+                                    class="btn btn-register w-100 py-3 fw-bold text-uppercase"
+                                    :disabled="isPaymentInProgress">
+                                    <span v-if="isPaymentInProgress"
+                                        class="spinner-border spinner-border-sm me-2"></span>
+                                    {{ isPaymentInProgress ? 'Opening Payment...' : 'PAY NOW' }}
+                                </button>
+                            </template>
                         </template>
 
-                        <div v-if="notification.message"
-                            :class="['alert mt-3 mb-0 py-2 px-3 rounded-3 small', notification.type === 'success' ? 'alert-success' : 'alert-danger']"
-                            role="alert">
-                            <span v-if="notification.type === 'success'">✅</span>
-                            <span v-else>❌</span>
-                            {{ notification.message }}
-                        </div>
-
-                        <div class="text-center mt-4">
+                        <div v-if="mode === 'dossier' && !isDownloaded" class="text-center mt-3">
                             <p class="small text-muted mb-0">
                                 By submitting, you agree to our
                                 <NuxtLink to="/terms-conditions" class="text-purple text-decoration-none fw-bold"
@@ -114,6 +142,15 @@
                                     Policy</NuxtLink>
                             </p>
                         </div>
+
+                        <div v-if="notification.message"
+                            :class="['alert mt-3 mb-0 py-2 px-3 rounded-3 small', notification.type === 'success' ? 'alert-success' : 'alert-danger']"
+                            role="alert">
+                            <span v-if="notification.type === 'success'">✅</span>
+                            <span v-else>❌</span>
+                            {{ notification.message }}
+                        </div>
+
                     </form>
                 </div>
             </div>
@@ -194,14 +231,14 @@ export default defineComponent({
             form.phone = '';
             form.state = '';
             form.city = '';
-            form.isCommerceGraduate = false;
+            form.isAgreed = false;
             citiesList.value = [];
             errors.name = '';
             errors.email = '';
             errors.phone = '';
             errors.state = '';
             errors.city = '';
-            errors.isCommerceGraduate = '';
+            errors.isAgreed = '';
             isDownloaded.value = false;
             notification.type = '';
             notification.message = '';
@@ -243,7 +280,7 @@ export default defineComponent({
             phone: '',
             state: '',
             city: '',
-            isCommerceGraduate: false
+            isAgreed: false
         });
 
         const errors = reactive({
@@ -252,7 +289,7 @@ export default defineComponent({
             phone: '',
             state: '',
             city: '',
-            isCommerceGraduate: ''
+            isAgreed: ''
         });
 
         const stateCity = stateCityData as Record<string, string[]>;
@@ -324,8 +361,8 @@ export default defineComponent({
                 errors.city = 'City is required';
                 isValid = false;
             }
-            if (!form.isCommerceGraduate) {
-                errors.isCommerceGraduate = 'You must be a commerce graduate to proceed';
+            if ((props.mode === 'apply' || (props.mode === 'dossier' && isDownloaded.value)) && !form.isAgreed) {
+                errors.isAgreed = 'You must agree to the Terms and Privacy Policy to proceed';
                 isValid = false;
             }
 
