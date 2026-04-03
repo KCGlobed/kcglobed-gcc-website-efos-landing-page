@@ -3,15 +3,15 @@
     'navbar top-navbar first-navbar',
     { sticky: isSticky },
   ]">
-    <div class="container-fluid d-flex justify-content-between align-items-center px-4">
+    <div class="container-fluid d-flex justify-center align-items-center px-4">
       <NuxtLink class="navbar-brand m-0" to="/">
         <img src="~/assets/Logo/Logo/GCC-School-Logo-White.jpeg" alt="GCC School Logo" class="gcc-logo" />
       </NuxtLink>
 
-      <a v-show="config.public.jointBrandLogo" :href="config.public.brandRedirectionLink" target="_blank"
+      <!-- <a v-show="config.public.jointBrandLogo" :href="config.public.brandRedirectionLink" target="_blank"
         class="joint-brand-link">
         <img :src="config.public.jointBrandLogo" alt="Joint Brand Logo" class="brand-logo" />
-      </a>
+      </a> -->
     </div>
   </nav>
 </template>
@@ -218,7 +218,7 @@ export default defineComponent({
 
 .container-fluid {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
 }
 
