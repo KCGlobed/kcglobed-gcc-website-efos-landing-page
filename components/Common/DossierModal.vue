@@ -265,7 +265,7 @@ export default defineComponent({
                 abandonmentTriggered.value = true;
                 const config = useRuntimeConfig();
                 try {
-                    await $fetch(`${config.public.apiBase}/api/career/abandonmentform`, {
+                    await $fetch(`${config.public.apiBase}/api/career/createabondantform`, {
                         method: 'POST',
                         body: {
                             full_name: form.name,
@@ -273,9 +273,6 @@ export default defineComponent({
                             phone: form.phone,
                             source: config.public.source,
                             source_form: props.mode === 'apply' ? 1 : 2,
-                            utm_source: utm_source.value,
-                            utm_medium: utm_medium.value,
-                            utm_campaign: utm_campaign.value,
                         }
                     });
                 } catch (err) {
