@@ -738,12 +738,15 @@ export default defineComponent({
                     const cfMode = res.environment === 'PRODUCTION' ? 'production' : 'sandbox';
                     const cashfree = (window as any).Cashfree({ mode: cfMode });
 
+                    // Close Modals before Cashfree starts explicitly, like Razorpay
+                    await closeDossierModal();
+                    await closeStatusModal();
+
                     cashfree.checkout({
                         paymentSessionId: res.payment_session_id,
                         redirectTarget: "_modal"
                     }).then(async (result: any) => {
                         restoreBodyScroll();
-                        await closeStatusModal(); // Close "Initializing..." modal
 
                         if (result.error) {
                             console.error("[PAYMENT] Cashfree error:", result.error);
@@ -773,7 +776,6 @@ export default defineComponent({
                                     }
                                 });
                                 await postPaymentSuccess(res.cf_order_id);
-                                await closeDossierModal();
                             } catch (e) {
                                 await closeStatusModal();
                                 console.error("[PAYMENT] complete-payment error:", e);
