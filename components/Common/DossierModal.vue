@@ -333,7 +333,7 @@ export default defineComponent({
 
         const submitForm = async () => {
             if (!validateForm()) return;
-
+            console.log(form,'---form');
                 isSubmitting.value = true;
                 const config = useRuntimeConfig();
 
