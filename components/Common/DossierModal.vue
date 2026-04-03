@@ -171,6 +171,11 @@ export default defineComponent({
         const isProcessing = ref(false);
         const processingMessage = ref('');
         const storedPassword = ref<string | null>(null);
+        
+        const route = useRoute();
+        const utm_source = computed(() => (route.query.utm_source as string) || (useCookie('utm_source').value) || '');
+        const utm_medium = computed(() => (route.query.utm_medium as string) || (useCookie('utm_medium').value) || '');
+        const utm_campaign = computed(() => (route.query.utm_campaign as string) || (useCookie('utm_campaign').value) || '');
 
         const alertPopup = reactive({
             show: false,
@@ -252,6 +257,36 @@ export default defineComponent({
             state: '',
             city: '',
             isCommerceGraduate: ''
+        });
+        const abandonmentTriggered = ref(false);
+        const triggerAbandonment = async () => {
+            if (abandonmentTriggered.value) return;
+            if (form.name && form.email && form.phone && validateEmail(form.email) && isValidMobile(form.phone)) {
+                abandonmentTriggered.value = true;
+                const config = useRuntimeConfig();
+                try {
+                    await $fetch(`${config.public.apiBase}/api/career/abandonmentform`, {
+                        method: 'POST',
+                        body: {
+                            full_name: form.name,
+                            email: form.email,
+                            phone: form.phone,
+                            source: config.public.source,
+                            source_form: props.mode === 'apply' ? 1 : 2,
+                            utm_source: utm_source.value,
+                            utm_medium: utm_medium.value,
+                            utm_campaign: utm_campaign.value,
+                        }
+                    });
+                } catch (err) {
+                    console.error('[Abandonment] Error:', err);
+                }
+            }
+        };
+
+        // Watch these fields to trigger abandonment
+        watch([() => form.name, () => form.email, () => form.phone], () => {
+            triggerAbandonment();
         });
 
         const stateCity = stateCityData as Record<string, string[]>;
@@ -347,6 +382,9 @@ export default defineComponent({
                         city: form.city,
                         source: config.public.source,
                         source_form: props.mode === 'apply' ? 1 : 2,
+                        utm_source: utm_source.value,
+                        utm_medium: utm_medium.value,
+                        utm_campaign: utm_campaign.value,
                     };
 
                 // ── Pre-Dossier Email Validation ──
@@ -402,7 +440,10 @@ export default defineComponent({
                             city: form.city,
                             form_type: 2,
                             form_id: formId.value,
-                            action: props.mode === 'apply' ? 'pay_now_clicked' : 'download_dossier_clicked'
+                            action: props.mode === 'apply' ? 'pay_now_clicked' : 'download_dossier_clicked',
+                            utm_source: utm_source.value,
+                            utm_medium: utm_medium.value,
+                            utm_campaign: utm_campaign.value,
                         }
                     }).catch(() => { /* silent — never block user flow */ });
 
@@ -523,17 +564,24 @@ export default defineComponent({
                 // if (studentRes.success && studentRes.data?.password) {
                     // await autoLogin(form.email, studentRes.data.password, pid);
                 // } else {
-                    // Fallback success state if registration fails but payment was done
-                    paymentStatus.value = 'success';
-                    paymentId.value = pid;
-                    processingMessage.value = 'Payment Successful!';
-                    resetForm();
+                    // Redirect directly to thank you page
+                    await closeStatusModal();
+                    await closeDossierModal();
+                    return navigateTo({
+                        path: '/thank-you',
+                        query: { payment_id: pid }
+                    });
                 // }
             } catch (regErr: any) {
                 console.error("[PAYMENT] Registration error after payment:", regErr);
-                paymentStatus.value = 'success';
                 paymentId.value = pid;
                 processingMessage.value = 'Payment Successful!';
+                await closeStatusModal();
+                await closeDossierModal();
+                return navigateTo({
+                    path: '/thank-you',
+                    query: { payment_id: pid }
+                });
             }
         };
 
