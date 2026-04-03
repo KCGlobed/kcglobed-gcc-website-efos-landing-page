@@ -258,9 +258,7 @@ export default defineComponent({
             city: '',
             isCommerceGraduate: ''
         });
-
         const abandonmentTriggered = ref(false);
-
         const triggerAbandonment = async () => {
             if (abandonmentTriggered.value) return;
             if (form.name && form.email && form.phone && validateEmail(form.email) && isValidMobile(form.phone)) {
