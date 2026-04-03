@@ -583,7 +583,8 @@
 </style>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, nextTick, defineAsyncComponent, onMounted, watch } from "vue";
+import { defineComponent, ref, reactive, nextTick, defineAsyncComponent, onMounted, watch, computed } from "vue";
+import { isValidMobile } from "~/utils/validators";
 
 const headers = new Headers();
 headers.append("X-CSCAPI-KEY", "Q3k5SXFtVjNubXRBZjdKRFJ1QVJLQkZqQ3lYT2JNVUhVZmhOYm5ESw==");
@@ -613,6 +614,11 @@ export default defineComponent({
         const paymentId = ref('');
         const processingMessage = ref('');
         const statusModalId = 'paymentStatusModal_programBanner';
+
+        const route = useRoute();
+        const utm_source = computed(() => (route.query.utm_source as string) || (useCookie('utm_source').value) || '');
+        const utm_medium = computed(() => (route.query.utm_medium as string) || (useCookie('utm_medium').value) || '');
+        const utm_campaign = computed(() => (route.query.utm_campaign as string) || (useCookie('utm_campaign').value) || '');
 
         const auth = useAuth();
 
@@ -689,6 +695,44 @@ export default defineComponent({
             state: "",
             city: "",
             consent: ""
+        });
+
+        const abandonmentTriggered = ref(false);
+
+        const validateEmail = (email: string) => {
+            return String(email)
+                .toLowerCase()
+                .match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+        };
+
+        const triggerAbandonment = async () => {
+            if (abandonmentTriggered.value) return;
+            if (form.name && form.email && form.mobile && validateEmail(form.email) && isValidMobile(form.mobile)) {
+                abandonmentTriggered.value = true;
+                const config = useRuntimeConfig();
+                try {
+                    await $fetch(`${config.public.apiBase}/api/career/abandonmentform`, {
+                        method: 'POST',
+                        body: {
+                            full_name: form.name,
+                            email: form.email,
+                            phone: form.mobile,
+                            source: config.public.source || 'website_banner_abandonment',
+                            source_form: 1,
+                            utm_source: utm_source.value,
+                            utm_medium: utm_medium.value,
+                            utm_campaign: utm_campaign.value,
+                        }
+                    });
+                } catch (err) {
+                    console.error('[Abandonment - ProgramBanner] Error:', err);
+                }
+            }
+        };
+
+        // Watch these fields to trigger abandonment
+        watch([() => form.name, () => form.email, () => form.mobile], () => {
+            triggerAbandonment();
         });
 
         const banners = reactive([
@@ -859,7 +903,10 @@ export default defineComponent({
                     email: form.email,
                     phone: form.mobile,
                     state: form.state,
-                    city: form.city
+                    city: form.city,
+                    utm_source: utm_source.value,
+                    utm_medium: utm_medium.value,
+                    utm_campaign: utm_campaign.value,
                 };
 
                 const response: any = await $fetch(`${config.public.apiBase}/api/career/createdossierform`, {
@@ -883,7 +930,10 @@ export default defineComponent({
                             city: form.city,
                             form_type: 2,
                             form_id: formId.value,
-                            action: 'download_brochure_clicked'
+                            action: 'download_brochure_clicked',
+                            utm_source: utm_source.value,
+                            utm_medium: utm_medium.value,
+                            utm_campaign: utm_campaign.value,
                         }
                     }).catch(() => { });
 
@@ -970,7 +1020,10 @@ export default defineComponent({
                         email: form.email,
                         mobile: form.mobile,
                         form_type: 2,
-                        form_id: formId.value
+                        form_id: formId.value,
+                        utm_source: utm_source.value,
+                        utm_medium: utm_medium.value,
+                        utm_campaign: utm_campaign.value,
                     }
                 });
 
@@ -1046,36 +1099,22 @@ export default defineComponent({
                                 );
 
                                 if (studentRes.success && studentRes.data?.password) {
-                                    await autoLogin(form.email, studentRes.data.password, res.cf_order_id);
+                                    // await autoLogin(form.email, studentRes.data.password, res.cf_order_id);
                                 } else {
-                                    // Fallback success state if registration fails but payment was done
-                                    paymentStatus.value = 'success';
-                                    paymentId.value = res.cf_order_id;
-                                    processingMessage.value = 'Payment Successful! Redirecting to profile...';
-                                    
-                                    // Reset form
-                                    form.name = '';
-                                    form.email = '';
-                                    form.mobile = '';
-                                    form.state = '';
-                                    form.city = '';
-                                    form.consent = false;
-                                    citiesList.value = [];
-                                    isDownloaded.value = false;
-                                    formId.value = null;
-
-                                    setTimeout(() => {
-                                        window.location.href = '/profile';
-                                    }, 3000);
+                                    // Redirect directly to thank you page
+                                    await closeStatusModal();
+                                    return navigateTo({
+                                        path: '/thank-you',
+                                        query: { payment_id: res.cf_order_id }
+                                    });
                                 }
                             } catch (regErr: any) {
                                 console.error("[PAYMENT] Registration error after payment:", regErr);
-                                paymentStatus.value = 'success';
-                                paymentId.value = res.cf_order_id;
-                                processingMessage.value = 'Payment Successful! Redirecting to profile...';
-                                setTimeout(() => {
-                                    window.location.href = '/profile';
-                                }, 3000);
+                                await closeStatusModal();
+                                return navigateTo({
+                                    path: '/thank-you',
+                                    query: { payment_id: res.cf_order_id }
+                                });
                             }
 
                         } catch (e) {
