@@ -16,14 +16,16 @@ function extractFormIdFromOrderId(orderId: string): string | null {
 export default defineEventHandler(async (event) => {
     const body = await readBody(event);
 
-    // ── CASHFREE fields ───────────────────────────────────────────────────────
-    const { cf_order_id, cf_payment_id, error_code, error_description, error_source, error_step, error_reason } = body;
-
-    // ── RAZORPAY fields ───────────────────────────────────────────────────────
-    const { razorpay_order_id, razorpay_payment_id } = body;
+    // ── RAZORPAY & CASHFREE fields ───────────────────────────────────────────
+    const { 
+        cf_order_id, cf_payment_id, 
+        razorpay_order_id, razorpay_payment_id,
+        error_code, error_description, error_source, error_step, error_reason 
+    } = body;
 
     const orderId = cf_order_id || razorpay_order_id;
-    const paymentId = cf_payment_id || razorpay_payment_id;
+    const paymentId = cf_payment_id || razorpay_payment_id || 'N/A';
+    const gateway = razorpay_order_id ? 'razorpay' : 'cashfree';
 
     if (!orderId) {
         console.error("[PAYMENT][failure] FAILED — Missing order ID in failure report", {
@@ -37,164 +39,116 @@ export default defineEventHandler(async (event) => {
     // --- LOG: Client Reported Failure (received) ---
     console.log("[PAYMENT][failure] Client reported a payment failure", {
         event: "client_reported_failure_received",
-        gateway: razorpay_order_id ? "razorpay" : "cashfree",
+        gateway,
         order_id: orderId,
-        payment_id: paymentId || null,
+        payment_id: paymentId,
         error_code: error_code || null,
         error_description: error_description || null,
-        error_source: error_source || null,
-        error_step: error_step || null,
-        error_reason: error_reason || null,
         timestamp: new Date().toISOString()
     });
 
     const config = useRuntimeConfig(event);
 
-    // ── CASHFREE: Initialize SDK ──────────────────────────────────────────────
-    let cashfree: ReturnType<typeof createCashfreeInstance>["instance"] | null = null;
-    if (cf_order_id) {
-        try {
-            const cf = createCashfreeInstance(config, event);
-            cashfree = cf.instance;
-        } catch (e: any) {
-            console.warn("[PAYMENT][failure] Cashfree config error — will save failure without order context", {
-                reason: e.message, order_id: orderId
-            });
-        }
-    }
-
-    // ── RAZORPAY: Initialize SDK ──────────────────────────────────────────────
-    let razorpay: any = null;
-    if (razorpay_order_id) {
-        try {
-            const rz = createRazorpayInstance(config);
-            razorpay = rz.instance;
-        } catch (e: any) {
-            console.warn("[PAYMENT][failure] Razorpay config error", { reason: e.message, order_id: orderId });
-        }
-    }
-
-    // ── Step 1: Try to fetch order context from Cashfree (best-effort) ────────
-    // FIX: This is now SEPARATE from the savePayment call.
-    // Even if PGFetchOrder fails, we still save the failure to DB with whatever we have.
+    // Default context
     let userId: string | null = null;
     let formType: string | null = null;
     let formId: string | null = null;
     let userName = '';
     let userEmail = '';
     let userMobile = '';
-    const activeGateway = config.paymentGateway || 'RAZORPAY';
-    let amount = activeGateway === 'RAZORPAY'
-        ? Number(config.razorpayAmount || 2950)
-        : Number(config.cashfreePaymentAmount || 2950);
-    let currency = 'INR';
+    let amount = Number(
+        process.env.RAZORPAY_PAYMENT_AMOUNT || 
+        process.env.CASHFREE_PAYMENT_AMOUNT || 
+        config.public?.paymentAmount || 
+        2950
+    );
 
-    if (cashfree && cf_order_id) {
+    console.log(`[PAYMENT][failure][debug] Runtime Amount Resolution:`, {
+        env_RAZORPAY_PAYMENT_AMOUNT: process.env.RAZORPAY_PAYMENT_AMOUNT,
+        env_CASHFREE_PAYMENT_AMOUNT: process.env.CASHFREE_PAYMENT_AMOUNT,
+        config_public_paymentAmount: config.public?.paymentAmount,
+        resolved_amount: amount
+    });
+    let currency = process.env.RAZORPAY_CURRENCY || config.razorpayCurrency || 'INR';
+
+    // ── Step 1: Try to fetch order context (best-effort) ────────
+    if (gateway === 'cashfree') {
         try {
-            const orderRes = await cashfree.PGFetchOrder(cf_order_id);
+            const { instance: cashfree } = createCashfreeInstance(config, event);
+            const orderRes = await cashfree.PGFetchOrder(orderId);
             const orderData = orderRes.data;
 
             amount = orderData.order_amount || amount;
             currency = orderData.order_currency || currency;
 
-            // Parse user context from order_note (stored at order creation)
             if (orderData.order_note) {
                 try {
                     const note = JSON.parse(orderData.order_note);
-                    userId = note.user_id || null;
+                    userId = note.user_id ? String(note.user_id) : null;
                     formType = note.form_type ? String(note.form_type) : null;
                     formId = note.form_id ? String(note.form_id) : null;
-                    userName = note.name || '';
-                    userEmail = note.email || '';
-                    userMobile = note.mobile || '';
-                } catch (_) {
-                    console.warn("[PAYMENT][failure] Could not parse order_note JSON", { cf_order_id });
-                }
+                    userName = note.name ? String(note.name) : '';
+                    userEmail = note.email ? String(note.email) : '';
+                    userMobile = note.mobile ? String(note.mobile) : '';
+                } catch (_) {}
             }
-
-            // Fallback: extract form_id from order_id string
-            if (!formId) {
-                formId = extractFormIdFromOrderId(cf_order_id);
-                if (formId) console.log("[PAYMENT][failure] Extracted form_id from order_id", { cf_order_id, form_id: formId });
+            if (!userEmail && orderData.customer_details?.customer_email) userEmail = String(orderData.customer_details.customer_email);
+            if (!userName && orderData.customer_details?.customer_name) userName = String(orderData.customer_details.customer_name);
+            if (!userMobile && orderData.customer_details?.customer_phone) userMobile = String(orderData.customer_details.customer_phone);
+        } catch (e: any) {
+            console.warn("[PAYMENT][failure] Could not fetch Cashfree order context", { orderId, error: e.message });
+        }
+    } else {
+        try {
+            const { instance: razorpay } = createRazorpayInstance(config);
+            const orderRes = await razorpay.orders.fetch(orderId);
+            amount = Number(orderRes.amount) / 100;
+            currency = orderRes.currency;
+            if (orderRes.notes) {
+                userId = orderRes.notes.user_id ? String(orderRes.notes.user_id) : null;
+                formType = orderRes.notes.form_type ? String(orderRes.notes.form_type) : null;
+                formId = orderRes.notes.form_id ? String(orderRes.notes.form_id) : null;
+                userName = orderRes.notes.name ? String(orderRes.notes.name) : '';
+                userEmail = orderRes.notes.email ? String(orderRes.notes.email) : '';
+                userMobile = orderRes.notes.mobile ? String(orderRes.notes.mobile) : '';
             }
-
-            // Fallback: use customer_details
-            if (!userEmail && orderData.customer_details?.customer_email) userEmail = orderData.customer_details.customer_email;
-            if (!userName && orderData.customer_details?.customer_name) userName = orderData.customer_details.customer_name;
-            if (!userMobile && orderData.customer_details?.customer_phone) userMobile = orderData.customer_details.customer_phone;
-
-        } catch (fetchError: any) {
-            // Log the fetch failure but do NOT abort — we continue to save below
-            console.warn("[PAYMENT][failure] Could not fetch Cashfree order (will still save failure record)", {
-                cf_order_id,
-                error_message: fetchError?.response?.data?.message || fetchError?.message,
-                timestamp: new Date().toISOString()
-            });
+        } catch (e: any) {
+            console.warn("[PAYMENT][failure] Could not fetch Razorpay order context", { orderId, error: e.message });
         }
     }
 
-    // ── Step 1b: Try to fetch order context from Razorpay (best-effort) ───────
-    if (razorpay && razorpay_order_id) {
-        try {
-            const orderData = await razorpay.orders.fetch(razorpay_order_id);
-
-            amount = (orderData.amount / 100) || amount; // Razorpay stores in paisa
-            currency = orderData.currency || currency;
-
-            if (orderData.notes) {
-                userId = orderData.notes.user_id || userId;
-                formType = orderData.notes.form_type || formType;
-                formId = orderData.notes.form_id || formId;
-                userName = orderData.notes.name || userName;
-                userEmail = orderData.notes.email || userEmail;
-                userMobile = orderData.notes.mobile || userMobile;
-            }
-
-            // Fallback: extract form_id from order_id if not in notes (rare)
-            if (!formId) {
-                formId = extractFormIdFromOrderId(razorpay_order_id);
-            }
-
-        } catch (fetchError: any) {
-            console.warn("[PAYMENT][failure] Could not fetch Razorpay order context", {
-                razorpay_order_id,
-                error_message: fetchError?.message || "Unknown error",
-                timestamp: new Date().toISOString()
-            });
-        }
+    // Fallback: extract form_id from order_id string
+    if (!formId) {
+        formId = extractFormIdFromOrderId(orderId);
     }
 
     // ── Step 2: Always save the failure record to DB ──────────────────────────
-    // This runs regardless of whether order fetch succeeded or failed.
     try {
         await savePayment({
             student_id: userId || null,
             form_type: formType || 1,
             form_id: formId,
             razorpay_order_id: orderId,
-            razorpay_payment_id: paymentId || 'N/A',
+            razorpay_payment_id: paymentId,
             razorpay_signature: 'N/A',
             amount,
             currency,
             status: "failed",
-            response: JSON.stringify({ ...body, source: "client_report", gateway: razorpay_order_id ? "razorpay" : "cashfree" })
+            response: JSON.stringify({ ...body, source: "client_report", gateway })
         });
 
         // --- LOG: Failure Recorded Successfully ---
-        console.log("[PAYMENT][failure] RECORDED — Client failure saved to DB", {
+        console.log(`[PAYMENT][failure] RECORDED — Client failure saved to DB (${gateway})`, {
             event: "client_reported_failure",
             status: "failed",
-            gateway: razorpay_order_id ? "razorpay" : "cashfree",
+            gateway,
             order_id: orderId,
-            payment_id: paymentId || 'N/A',
+            payment_id: paymentId,
             amount, currency,
             user_id: userId, name: userName, email: userEmail, mobile: userMobile,
             form_type: formType, form_id: formId,
             error_code: error_code || null,
             error_description: error_description || null,
-            error_source: error_source || null,
-            error_step: error_step || null,
-            error_reason: error_reason || null,
             timestamp: new Date().toISOString()
         });
 

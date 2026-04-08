@@ -44,13 +44,13 @@ export default defineNuxtConfig({
   ],
   modules: ["@bootstrap-vue-next/nuxt", "nuxt-swiper", "nuxt-aos"],
   runtimeConfig: {
-    source: process.env.SOURCE || '2',
+    source: process.env.NUXT_PUBLIC_SOURCE || process.env.SOURCE,
 
     // ── Razorpay (disabled – kept for reference) ──────────────────────────────
     razorpayKeyId: process.env.RAZORPAY_KEY_ID,
     razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET,
     razorpayCurrency: process.env.RAZORPAY_CURRENCY || 'INR',
-    razorpayAmount: process.env.RAZORPAY_PAYMENT_AMOUNT || '2950',
+    razorpayAmount: process.env.RAZORPAY_PAYMENT_AMOUNT || process.env.NUXT_PUBLIC_PAYMENT_AMOUNT || '2950',
 
     // ── Cashfree ──────────────────────────────────────────────────────────────
     cashfreeAppId: process.env.CASH_FREE_APP_ID_PROD,
@@ -59,7 +59,7 @@ export default defineNuxtConfig({
     cashfreeSecretKeyDev: process.env.CASH_FREE_SECRET_KEY_DEV,
     // Set to 'SANDBOX' for test, 'PRODUCTION' for live
     cashfreeEnvironment: process.env.CASHFREE_ENVIRONMENT || 'PRODUCTION',
-    cashfreePaymentAmount: process.env.CASHFREE_PAYMENT_AMOUNT || '2950',
+    cashfreePaymentAmount: process.env.CASHFREE_PAYMENT_AMOUNT || process.env.NUXT_PUBLIC_PAYMENT_AMOUNT || '2950',
 
     // ── Payment Gateway Selector ──────────────────────────────────────────────
     // 'CASHFREE' or 'RAZORPAY'
@@ -71,13 +71,17 @@ export default defineNuxtConfig({
     emailPassword: process.env.EMAIL_HOST_PASSWORD,
 
     public: {
-      source: process.env.SOURCE || '2',
-      paymentGateway: process.env.PAYMENT_GATEWAY || 'CASHFREE',
-      paymentAmount: process.env.PAYMENT_AMOUNT,
+      paymentGateway: process.env.NUXT_PUBLIC_PAYMENT_GATEWAY || process.env.PAYMENT_GATEWAY || 'CASHFREE',
+      paymentAmount: process.env.RAZORPAY_PAYMENT_AMOUNT || process.env.CASHFREE_PAYMENT_AMOUNT || process.env.NUXT_PUBLIC_PAYMENT_AMOUNT || '2950',
+      source: process.env.NUXT_PUBLIC_SOURCE || process.env.SOURCE,
       apiBase: process.env.NUXT_PUBLIC_API_BASE,
       nfetDates: process.env.NUXT_PUBLIC_NFET_DATES || '',
       nfetSlots: process.env.NUXT_PUBLIC_NFET_SLOTS || '',
       nfetSlotBufferHours: process.env.NUXT_PUBLIC_NFET_SLOT_BUFFER_HOURS || '48',
+      jointBrandLogo: process.env.JOINT_BRAND_LOGO || '',
+      brandRedirectionLink: process.env.BRAND_REDIRECTION_LINK || '#',
+      jointBrandHomeBanner:process.env.HOME_BANNER_FOR_JOINT_COLLAB
+
     }
   },
   plugins: ["~/plugins/scrollReveal.ts"],

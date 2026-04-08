@@ -12,10 +12,12 @@ export default defineEventHandler(async (event) => {
 
     try {
         const config = useRuntimeConfig(event);
-        const activeGateway = config.paymentGateway || 'RAZORPAY';
-        const amount = activeGateway === 'RAZORPAY'
-            ? Number(config.razorpayAmount || 2950)
-            : Number(config.cashfreePaymentAmount || 2950);
+        const amount = Number(
+            process.env.RAZORPAY_PAYMENT_AMOUNT || 
+            process.env.CASHFREE_PAYMENT_AMOUNT || 
+            config.cashfreePaymentAmount || 
+            2950
+        );
 
         const id = await savePayment({
             student_id: null,

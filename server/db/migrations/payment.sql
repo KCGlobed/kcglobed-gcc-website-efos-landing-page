@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS payments (
   re_attempt_status BOOLEAN DEFAULT false,
   response JSONB,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  re_attempt_status BOOLEAN DEFAULT false
 );
 
 -- Run these on your live DB if the table already exists with NOT NULL constraints:

@@ -15,9 +15,19 @@ export default defineEventHandler(async (event) => {
     });
 
     const amount = activeGateway === 'RAZORPAY'
-        ? Number(config.razorpayAmount || 2950)
-        : Number(config.cashfreePaymentAmount || 2950);
-    const currency = 'INR';
+        ? Number(process.env.RAZORPAY_PAYMENT_AMOUNT || config.razorpayAmount || 2950)
+        : Number(process.env.CASHFREE_PAYMENT_AMOUNT || config.cashfreePaymentAmount || 2950);
+    const currency = process.env.RAZORPAY_CURRENCY || config.razorpayCurrency || 'INR';
+
+    console.log(`[PAYMENT][debug] Runtime Amount Resolution:`, {
+        activeGateway,
+        env_RAZORPAY_PAYMENT_AMOUNT: process.env.RAZORPAY_PAYMENT_AMOUNT,
+        env_CASHFREE_PAYMENT_AMOUNT: process.env.CASHFREE_PAYMENT_AMOUNT,
+        config_razorpayAmount: config.razorpayAmount,
+        config_cashfreePaymentAmount: config.cashfreePaymentAmount,
+        resolved_amount: amount,
+        timestamp: new Date().toISOString()
+    });
 
     if (activeGateway === 'RAZORPAY') {
         try {
@@ -50,6 +60,7 @@ export default defineEventHandler(async (event) => {
         let cfEnvironment: string;
         try {
             const cf = createCashfreeInstance(config, event);
+            console.log(cf, '---this is cf----')
             cashfree = cf.instance;
             cfEnvironment = cf.cfEnvironment;
         } catch (e: any) {
