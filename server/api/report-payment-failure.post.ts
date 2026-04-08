@@ -137,7 +137,8 @@ export default defineEventHandler(async (event) => {
             amount,
             currency,
             status: "failed",
-            response: JSON.stringify({ ...body, source: "client_report", gateway })
+            response: JSON.stringify({ ...body, source: "client_report", gateway }),
+            source:4
         });
 
         // --- LOG: Failure Recorded Successfully ---

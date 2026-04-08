@@ -45,7 +45,7 @@ export async function savePayment(data: any) {
     data.status || 'success',
     data.response,
     data.form_id,
-    Number(sourceValue || 1)
+    Number( data.source || sourceValue || 1)
   ];
 
   const result = await pool.query(query, values);
