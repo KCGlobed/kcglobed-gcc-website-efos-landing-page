@@ -490,7 +490,7 @@ export default defineComponent({
                         state: form.state,
                         city: form.city,
                         university: form.university,
-                        source: config.public.source,
+                        source: config.public.source || 2,
                         source_form: props.mode === 'apply' ? 1 : 2,
                         utm_source: utm_source.value,
                         utm_medium: utm_medium.value,
