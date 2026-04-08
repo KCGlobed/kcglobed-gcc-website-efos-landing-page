@@ -464,8 +464,10 @@ export default defineComponent({
                 errors.university = 'University is required';
                 isValid = false;
             }
-            if (!form.isCommerceGraduate) {
-                errors.isCommerceGraduate = 'You must be a commerce graduate to proceed';
+
+            const isCheckboxRequired = props.mode === 'apply' || isDownloaded.value;
+            if (isCheckboxRequired && !form.isCommerceGraduate) {
+                errors.isCommerceGraduate = 'You must agree to the Terms and Privacy Policy to proceed';
                 isValid = false;
             }
 
