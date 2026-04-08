@@ -163,7 +163,8 @@ export default defineEventHandler(async (event) => {
                 email: userEmail,
                 mobile: userMobile,
                 city, state
-            })
+            }),
+            source: 2
         });
 
         // Optional: send confirmation email logic here

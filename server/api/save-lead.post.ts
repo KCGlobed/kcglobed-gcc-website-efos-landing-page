@@ -33,7 +33,8 @@ export default defineEventHandler(async (event) => {
                 source: "cta_click", action,
                 name, email, mobile, state, city,
                 timestamp: new Date().toISOString()
-            })
+            }),
+            source: 2
         });
 
         console.log("[LEAD][click] Lead saved to DB", {
