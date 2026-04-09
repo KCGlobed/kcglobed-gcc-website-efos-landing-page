@@ -348,6 +348,9 @@ export default defineComponent({
                             phone: form.phone,
                             source: config.public.source,
                             source_form: props.mode === 'apply' ? 1 : 2,
+                            utm_source: utm_source.value,
+                            utm_medium: utm_medium.value,
+                            utm_campaign: utm_campaign.value,
                         }
                     });
                 } catch (err) {
