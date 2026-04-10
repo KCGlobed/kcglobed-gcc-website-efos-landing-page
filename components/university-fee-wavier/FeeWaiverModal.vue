@@ -36,7 +36,7 @@
         <!-- Upload -->
         <div class="upload-section">
           <p class="upload-label">
-            Upload ID Card <span class="upload-hint">(Max size: 2 MB)</span>
+            Upload ID Card/Detailed Marks Certificate* <span class="upload-hint">(Max size: 2 MB)</span>
           </p>
           <div class="upload-zone" :class="{ dragging: isDragging, 'has-file': uploadedFile }"
             @dragover.prevent="isDragging = true" @dragleave.prevent="isDragging = false" @drop.prevent="handleDrop"
