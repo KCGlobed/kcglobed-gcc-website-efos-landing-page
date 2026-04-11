@@ -62,7 +62,8 @@
                             <div class="searchable-select">
                                 <input type="text" class="form-control custom-input" v-model="searchQuery"
                                     placeholder="Search University..." autocomplete="off"
-                                    @focus="showUniDropdown = true" @input="showUniDropdown = true; form.university = searchQuery">
+                                    @focus="showUniDropdown = true"
+                                    @input="showUniDropdown = true; form.university = searchQuery">
                                 <div v-if="showUniDropdown && filteredUniversities.length > 0"
                                     class="dropdown-list shadow-sm">
                                     <div v-for="uni in filteredUniversities" :key="uni.id" class="dropdown-item"
@@ -77,7 +78,8 @@
                         <!-- Apply mode: single PAY NOW submit button -->
                         <div v-if="mode === 'apply'">
                             <div class="mb-3">
-                                <div class="form-check custom-checkbox d-flex align-items-center justify-content-start gap-2">
+                                <div
+                                    class="form-check custom-checkbox d-flex align-items-center justify-content-start gap-2">
                                     <input class="form-check-input mt-0" type="checkbox"
                                         v-model="form.isCommerceGraduate" id="commerceCheckApply">
                                     <label class="form-check-label small text-muted mb-0" for="commerceCheckApply">
@@ -132,7 +134,8 @@
 
                             <div v-else>
                                 <div class="mb-3">
-                                    <div class="form-check custom-checkbox d-flex align-items-center justify-content-start gap-2">
+                                    <div
+                                        class="form-check custom-checkbox d-flex align-items-center justify-content-start gap-2">
                                         <input class="form-check-input mt-0" type="checkbox"
                                             v-model="form.isCommerceGraduate" id="commerceCheckPay">
                                         <label class="form-check-label small text-muted mb-0" for="commerceCheckPay">
@@ -240,7 +243,7 @@ export default defineComponent({
         const isProcessing = ref(false);
         const processingMessage = ref('');
         const storedPassword = ref<string | null>(null);
-        
+
         const route = useRoute();
         const utm_source = computed(() => (route.query.utm_source as string) || (useCookie('utm_source').value) || '');
         const utm_medium = computed(() => (route.query.utm_medium as string) || (useCookie('utm_medium').value) || '');
@@ -368,12 +371,11 @@ export default defineComponent({
         const states = ref<string[]>([]);
         const citiesList = ref<string[]>([]);
         const universityList = ref([
-            ...selectUniversityList.map((name, index) => ({ id: `s-${index}`, name, isHighlight: true })),
             ...universitiesList
                 .filter(name => !selectUniversityList.includes(name))
-                .map((name, index) => ({ id: `u-${index}`, name, isHighlight: false }))
+                .map((name, index) => ({ id: `u-${index}`, name, isHighlight: false })),
+            ...selectUniversityList.map((name, index) => ({ id: `s-${index}`, name, isHighlight: true }))
         ]);
-
         const filteredUniversities = computed(() => {
             const query = searchQuery.value.trim().toLowerCase();
             if (!query) return universityList.value;
@@ -480,25 +482,25 @@ export default defineComponent({
 
         const submitForm = async () => {
             if (!validateForm()) return;
-            console.log(form,'---form');
-                isSubmitting.value = true;
-                const config = useRuntimeConfig();
+            console.log(form, '---form');
+            isSubmitting.value = true;
+            const config = useRuntimeConfig();
 
-                try {
-                    // Prepare payload for API
-                    const payload = {
-                        full_name: form.name,
-                        email: form.email,
-                        phone: form.phone,
-                        state: form.state,
-                        city: form.city,
-                        university: form.university,
-                        source: config.public.source || 2,
-                        source_form: props.mode === 'apply' ? 1 : 2,
-                        utm_source: utm_source.value,
-                        utm_medium: utm_medium.value,
-                        utm_campaign: utm_campaign.value,
-                    };
+            try {
+                // Prepare payload for API
+                const payload = {
+                    full_name: form.name,
+                    email: form.email,
+                    phone: form.phone,
+                    state: form.state,
+                    city: form.city,
+                    university: form.university,
+                    source: config.public.source || 2,
+                    source_form: props.mode === 'apply' ? 1 : 2,
+                    utm_source: utm_source.value,
+                    utm_medium: utm_medium.value,
+                    utm_campaign: utm_campaign.value,
+                };
 
                 // ── Pre-Dossier Email Validation ──
                 try {
@@ -577,7 +579,7 @@ export default defineComponent({
                     } else {
                         // In dossier mode: trigger download
                         window.location.href = `/api/download?url=${encodeURIComponent(fileUrl)}&filename=${encodeURIComponent(fileName)}`;
-                        
+
                         const selectedUni = universityList.value.find(u => u.name === form.university);
                         if (selectedUni && selectedUni.isHighlight) {
                             showNotification('success', 'Dossier downloaded! Opening Fee Waiver...');
@@ -698,15 +700,15 @@ export default defineComponent({
                 resetForm();
 
                 // if (studentRes.success && studentRes.data?.password) {
-                    // await autoLogin(form.email, studentRes.data.password, pid);
+                // await autoLogin(form.email, studentRes.data.password, pid);
                 // } else {
-                    // Redirect directly to thank you page
-                    await closeStatusModal();
-                    await closeDossierModal();
-                    return navigateTo({
-                        path: '/thank-you',
-                        query: { payment_id: pid }
-                    });
+                // Redirect directly to thank you page
+                await closeStatusModal();
+                await closeDossierModal();
+                return navigateTo({
+                    path: '/thank-you',
+                    query: { payment_id: pid }
+                });
                 // }
             } catch (regErr: any) {
                 console.error("[PAYMENT] Registration error after payment:", regErr);
