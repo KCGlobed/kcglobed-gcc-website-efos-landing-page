@@ -15,7 +15,7 @@ function extractFormIdFromOrderId(orderId: string): string | null {
 
 export default defineEventHandler(async (event) => {
     const body = await readBody(event);
-
+    
     // ── RAZORPAY & CASHFREE fields ───────────────────────────────────────────
     const { 
         cf_order_id, cf_payment_id, 
@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
     });
 
     const config = useRuntimeConfig(event);
-
+    const sourceValue = process.env.SOURCE || process.env.NUXT_PUBLIC_SOURCE || config.source;
     // Default context
     let userId: string | null = null;
     let formType: string | null = null;
@@ -135,7 +135,7 @@ export default defineEventHandler(async (event) => {
             currency,
             status: "failed",
             response: JSON.stringify({ ...body, source: "client_report", gateway }),
-            source: 2
+            source: Number(sourceValue || 5)
         });
 
         // --- LOG: Failure Recorded Successfully ---
