@@ -488,7 +488,7 @@ export default defineComponent({
 
             try {
                 // Prepare payload for API
-                const payload = {
+                const payload: any = {
                     full_name: form.name,
                     email: form.email,
                     phone: form.phone,
@@ -501,6 +501,11 @@ export default defineComponent({
                     utm_medium: utm_medium.value,
                     utm_campaign: utm_campaign.value,
                 };
+
+                const selectedUni = universityList.value.find(u => u.name === form.university);
+                if (selectedUni && selectedUni.isHighlight) {
+                    payload.fee_waiver_category = "Free of cost (FOC)";
+                }
 
                 // ── Pre-Dossier Email Validation ──
                 try {
