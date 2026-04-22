@@ -2,8 +2,8 @@
   <div class="copy-right-warp">
     <div class="container">
       <div class="copy-right-content">
-        <p>
-          Copyright © {{ new Date().getFullYear() }} GCC School
+       <p>
+          Copyright ©️ {{ new Date().getFullYear() }} KC Global Edutech Private Limited
         </p>
       </div>
     </div>
