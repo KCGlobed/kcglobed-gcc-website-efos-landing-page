@@ -1,29 +1,26 @@
-// ── CASHFREE: active (cashfree-pg v5) ────────────────────────────────────────
 import { createCashfreeInstance } from "../utils/cashfree";
+import { createRazorpayInstance } from "../utils/razorpay";
 import { savePayment } from "../services/payment.service";
 import { sendPaymentFailureEmail } from "../services/email.service";
 
 // Helper: extract form_id from order_id string (e.g. "cf_322_1772694830212" → "322")
 function extractFormIdFromOrderId(orderId: string): string | null {
     const parts = orderId.split('_');
-    if (parts.length >= 3) {
+    if (parts.length >= 2) {
         const extracted = parts[1];
-        if (extracted && extracted !== 'guest' && extracted !== 'null') return extracted;
+        if (extracted && extracted !== 'guest' && extracted !== 'null' && !isNaN(Number(extracted))) return extracted;
     }
     return null;
 }
-
-// ── RAZORPAY: disabled (kept for reference) ───────────────────────────────────
-// import Razorpay from "razorpay";
 
 export default defineEventHandler(async (event) => {
     const body = await readBody(event);
 
     // ── RAZORPAY & CASHFREE fields ───────────────────────────────────────────
-    const { 
-        cf_order_id, cf_payment_id, 
+    const {
+        cf_order_id, cf_payment_id,
         razorpay_order_id, razorpay_payment_id,
-        error_code, error_description, error_source, error_step, error_reason 
+        error_code, error_description, error_source, error_step, error_reason
     } = body;
 
     const orderId = cf_order_id || razorpay_order_id;
@@ -51,7 +48,7 @@ export default defineEventHandler(async (event) => {
     });
 
     const config = useRuntimeConfig(event);
-
+    const sourceVal = config?.source || 6;
     // Default context
     let userId: string | null = null;
     let formType: string | null = null;
@@ -60,10 +57,10 @@ export default defineEventHandler(async (event) => {
     let userEmail = '';
     let userMobile = '';
     let amount = Number(
-        process.env.RAZORPAY_PAYMENT_AMOUNT || 
-        process.env.CASHFREE_PAYMENT_AMOUNT || 
-        config.public?.paymentAmount || 
-        2950
+        process.env.RAZORPAY_PAYMENT_AMOUNT ||
+        process.env.CASHFREE_PAYMENT_AMOUNT ||
+        config.public?.paymentAmount ||
+        295
     );
 
     console.log(`[PAYMENT][failure][debug] Runtime Amount Resolution:`, {
@@ -93,7 +90,7 @@ export default defineEventHandler(async (event) => {
                     userName = note.name ? String(note.name) : '';
                     userEmail = note.email ? String(note.email) : '';
                     userMobile = note.mobile ? String(note.mobile) : '';
-                } catch (_) {}
+                } catch (_) { }
             }
             if (!userEmail && orderData.customer_details?.customer_email) userEmail = String(orderData.customer_details.customer_email);
             if (!userName && orderData.customer_details?.customer_name) userName = String(orderData.customer_details.customer_name);
@@ -137,7 +134,8 @@ export default defineEventHandler(async (event) => {
             amount,
             currency,
             status: "failed",
-            response: JSON.stringify({ ...body, source: "client_report", gateway })
+            response: JSON.stringify({ ...body, source: "client_report", gateway }),
+            source: sourceVal
         });
 
         // --- LOG: Failure Recorded Successfully ---
@@ -184,9 +182,9 @@ export default defineEventHandler(async (event) => {
     } catch (saveError: any) {
         console.error("[PAYMENT][failure] ERROR — Could not save failure record to DB", {
             event: "client_report_save_error",
-            gateway: "cashfree",
-            cf_order_id,
-            cf_payment_id: cf_payment_id || null,
+            gateway: razorpay_order_id ? "razorpay" : "cashfree",
+            order_id: orderId,
+            payment_id: paymentId || null,
             error_message: saveError?.message || saveError,
             timestamp: new Date().toISOString()
         });

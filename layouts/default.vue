@@ -48,8 +48,8 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     
-    const ALLOWED_ROUTES = ["/", "/terms-conditions", "/privacy-policy"];
-    const ALLOWED_NAMES  = ["index", "terms-conditions", "privacy-policy"];
+    const ALLOWED_ROUTES = ["/", "/terms-conditions", "/privacy-policy", "/thank-you"];
+    const ALLOWED_NAMES  = ["index", "terms-conditions", "privacy-policy", "thank-you"];
 
     const isAllowedPage = computed(() => {
       return (

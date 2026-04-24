@@ -15,8 +15,8 @@ export default defineEventHandler(async (event) => {
     });
 
     const amount = activeGateway === 'RAZORPAY'
-        ? Number(process.env.RAZORPAY_PAYMENT_AMOUNT || config.razorpayAmount || 2950)
-        : Number(process.env.CASHFREE_PAYMENT_AMOUNT || config.cashfreePaymentAmount || 2950);
+        ? Number(process.env.RAZORPAY_PAYMENT_AMOUNT || config.razorpayAmount || 295)
+        : Number(process.env.CASHFREE_PAYMENT_AMOUNT || config.cashfreePaymentAmount || 295);
     const currency = process.env.RAZORPAY_CURRENCY || config.razorpayCurrency || 'INR';
 
     console.log(`[PAYMENT][debug] Runtime Amount Resolution:`, {
@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
                 amount: amount * 100, // Razorpay takes amount in paisa
                 currency,
                 receipt: `rcpt_${user_id || form_id || 'guest'}_${Date.now()}`,
-                notes: { user_id, form_type, form_id, name, email, mobile, city, state }
+                notes: { user_id, form_type, form_id, name, email, mobile, city, state },
             };
 
             const order = await razorpay.orders.create(orderOptions);
