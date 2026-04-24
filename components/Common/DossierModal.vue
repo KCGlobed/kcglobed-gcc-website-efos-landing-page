@@ -350,7 +350,7 @@ export default defineComponent({
                             full_name: form.name,
                             email: form.email,
                             phone: form.phone,
-                            source: config.public.source,
+                            source: config.public.source || 6,
                             source_form: props.mode === 'apply' ? 1 : 2,
                             utm_source: utm_source.value,
                             utm_medium: utm_medium.value,

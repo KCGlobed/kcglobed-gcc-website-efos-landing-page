@@ -17,10 +17,10 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
 
     // ── RAZORPAY & CASHFREE fields ───────────────────────────────────────────
-    const { 
-        cf_order_id, cf_payment_id, 
+    const {
+        cf_order_id, cf_payment_id,
         razorpay_order_id, razorpay_payment_id,
-        error_code, error_description, error_source, error_step, error_reason 
+        error_code, error_description, error_source, error_step, error_reason
     } = body;
 
     const orderId = cf_order_id || razorpay_order_id;
@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
     });
 
     const config = useRuntimeConfig(event);
-
+    const sourceVal = config?.source || 6;
     // Default context
     let userId: string | null = null;
     let formType: string | null = null;
@@ -57,10 +57,10 @@ export default defineEventHandler(async (event) => {
     let userEmail = '';
     let userMobile = '';
     let amount = Number(
-        process.env.RAZORPAY_PAYMENT_AMOUNT || 
-        process.env.CASHFREE_PAYMENT_AMOUNT || 
-        config.public?.paymentAmount || 
-        2950
+        process.env.RAZORPAY_PAYMENT_AMOUNT ||
+        process.env.CASHFREE_PAYMENT_AMOUNT ||
+        config.public?.paymentAmount ||
+        295
     );
 
     console.log(`[PAYMENT][failure][debug] Runtime Amount Resolution:`, {
@@ -90,7 +90,7 @@ export default defineEventHandler(async (event) => {
                     userName = note.name ? String(note.name) : '';
                     userEmail = note.email ? String(note.email) : '';
                     userMobile = note.mobile ? String(note.mobile) : '';
-                } catch (_) {}
+                } catch (_) { }
             }
             if (!userEmail && orderData.customer_details?.customer_email) userEmail = String(orderData.customer_details.customer_email);
             if (!userName && orderData.customer_details?.customer_name) userName = String(orderData.customer_details.customer_name);
@@ -135,7 +135,7 @@ export default defineEventHandler(async (event) => {
             currency,
             status: "failed",
             response: JSON.stringify({ ...body, source: "client_report", gateway }),
-            source: 2
+            source: sourceVal
         });
 
         // --- LOG: Failure Recorded Successfully ---

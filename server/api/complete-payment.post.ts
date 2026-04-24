@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     const config = useRuntimeConfig(event);
     const activeGateway = config.paymentGateway || 'RAZORPAY';
-
+    const source = config.source;
     let userId: string | null = null;
     let formType: string | null = null;
     let formId: string | null = null;
@@ -175,7 +175,7 @@ export default defineEventHandler(async (event) => {
                 mobile: userMobile,
                 city, state
             }),
-            source: 2,
+            source: source,
             fee_waiver_category: feeWaiverCategory
 
         });

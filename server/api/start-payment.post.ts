@@ -15,8 +15,8 @@ export default defineEventHandler(async (event) => {
     });
 
     const amount = activeGateway === 'RAZORPAY'
-        ? Number(process.env.RAZORPAY_PAYMENT_AMOUNT || config.razorpayAmount || 2950)
-        : Number(process.env.CASHFREE_PAYMENT_AMOUNT || config.cashfreePaymentAmount || 2950);
+        ? Number(process.env.RAZORPAY_PAYMENT_AMOUNT || config.razorpayAmount || 295)
+        : Number(process.env.CASHFREE_PAYMENT_AMOUNT || config.cashfreePaymentAmount || 295);
     const currency = process.env.RAZORPAY_CURRENCY || config.razorpayCurrency || 'INR';
 
     console.log(`[PAYMENT][debug] Runtime Amount Resolution:`, {

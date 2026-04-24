@@ -46,7 +46,7 @@ export async function savePayment(data: any) {
     data.status || 'success',
     data.response,
     data.form_id,
-    Number(data.source || sourceValue || 1),
+    Number(data.source || sourceValue || 6),
     data.fee_waiver_category || 'No Waiver'
   ];
 

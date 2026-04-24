@@ -50,7 +50,7 @@ export default defineNuxtConfig({
     razorpayKeyId: process.env.RAZORPAY_KEY_ID,
     razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET,
     razorpayCurrency: process.env.RAZORPAY_CURRENCY || 'INR',
-    razorpayAmount: process.env.RAZORPAY_PAYMENT_AMOUNT || process.env.NUXT_PUBLIC_PAYMENT_AMOUNT || '2950',
+    razorpayAmount: process.env.RAZORPAY_PAYMENT_AMOUNT || process.env.NUXT_PUBLIC_PAYMENT_AMOUNT || '295',
 
     // ── Cashfree ──────────────────────────────────────────────────────────────
     cashfreeAppId: process.env.CASH_FREE_APP_ID_PROD,
@@ -59,7 +59,7 @@ export default defineNuxtConfig({
     cashfreeSecretKeyDev: process.env.CASH_FREE_SECRET_KEY_DEV,
     // Set to 'SANDBOX' for test, 'PRODUCTION' for live
     cashfreeEnvironment: process.env.CASHFREE_ENVIRONMENT || 'PRODUCTION',
-    cashfreePaymentAmount: process.env.CASHFREE_PAYMENT_AMOUNT || process.env.NUXT_PUBLIC_PAYMENT_AMOUNT || '2950',
+    cashfreePaymentAmount: process.env.CASHFREE_PAYMENT_AMOUNT || process.env.NUXT_PUBLIC_PAYMENT_AMOUNT || '295',
 
     // ── Payment Gateway Selector ──────────────────────────────────────────────
     // 'CASHFREE' or 'RAZORPAY'
@@ -72,7 +72,7 @@ export default defineNuxtConfig({
 
     public: {
       paymentGateway: process.env.NUXT_PUBLIC_PAYMENT_GATEWAY || process.env.PAYMENT_GATEWAY || 'CASHFREE',
-      paymentAmount: process.env.RAZORPAY_PAYMENT_AMOUNT || process.env.CASHFREE_PAYMENT_AMOUNT || process.env.NUXT_PUBLIC_PAYMENT_AMOUNT || '2950',
+      paymentAmount: process.env.RAZORPAY_PAYMENT_AMOUNT || process.env.CASHFREE_PAYMENT_AMOUNT || process.env.NUXT_PUBLIC_PAYMENT_AMOUNT || '295',
       source: process.env.NUXT_PUBLIC_SOURCE || process.env.SOURCE,
       apiBase: process.env.NUXT_PUBLIC_API_BASE,
       nfetDates: process.env.NUXT_PUBLIC_NFET_DATES || '',
