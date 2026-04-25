@@ -157,8 +157,6 @@ export default defineEventHandler(async (event) => {
 
         feeWaiverCategory = `${waiverPercent}% Fee Waiver`;
     }
-
-
     // ── Save success to DB ────────────────────────────────────────────────────
     try {
         const paymentDbId = await savePayment({
