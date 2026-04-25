@@ -146,7 +146,7 @@ export default defineEventHandler(async (event) => {
             throw createError({ statusCode: 500, message: "Failed to verify Cashfree payment" });
         }
     }
-    const baseAmount = Number(config.paymentAmount || 2950);
+    const baseAmount = 2950
     let feeWaiverCategory = "No Waiver";
     if (amount === 1 || amount === 0 || amount === 2) {
         feeWaiverCategory = "Free of cost (FOC)";
