@@ -60,7 +60,7 @@ export default defineEventHandler(async (event) => {
         process.env.RAZORPAY_PAYMENT_AMOUNT ||
         process.env.CASHFREE_PAYMENT_AMOUNT ||
         config.public?.paymentAmount ||
-        295
+        249
     );
 
     console.log(`[PAYMENT][failure][debug] Runtime Amount Resolution:`, {
