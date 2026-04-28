@@ -159,12 +159,12 @@
                                         </small>
                                     </div>
                                 </div>
-                                <button type="button" @click="handlePayment"
+                                <button type="button" @click="handleCreateStudent"
                                     class="btn btn-register w-100 py-3 fw-bold text-uppercase"
-                                    :disabled="isPaymentInProgress">
-                                    <span v-if="isPaymentInProgress"
+                                    :disabled="isProcessingStudent">
+                                    <span v-if="isProcessingStudent"
                                         class="spinner-border spinner-border-sm me-2"></span>
-                                    {{ isPaymentInProgress ? 'Opening Payment...' : 'PAY NOW' }}
+                                    {{ isProcessingStudent ? 'Creating Account...' : 'CREATE ACCOUNT' }}
                                 </button>
                             </div>
                         </template>
@@ -230,7 +230,7 @@ export default defineComponent({
     setup(props) {
         const statusModalId = `paymentStatusModal_${props.modalId}`;
         const isSubmitting = ref(false);
-        const isPaymentInProgress = ref(false);
+        const isProcessingStudent = ref(false);
         const isDownloaded = ref(false);
         const showFeeWaiverModal = ref(false);
         const searchQuery = ref("");
@@ -500,6 +500,7 @@ export default defineComponent({
                     utm_source: utm_source.value,
                     utm_medium: utm_medium.value,
                     utm_campaign: utm_campaign.value,
+                    fee_waiver_category: "Free of cost (FOC)"
                 };
 
                 const selectedUni = universityList.value.find(u => u.name === form.university);
@@ -575,11 +576,11 @@ export default defineComponent({
                             await closeDossierModal();
                             showFeeWaiverModal.value = true;
                         } else {
-                            // In apply mode: skip download, go straight to payment
-                            showNotification('success', 'Details submitted! Opening payment...');
+                            // In apply mode: skip download, go straight to account creation
+                            showNotification('success', 'Details submitted! Creating Account...');
                             isDownloaded.value = true;
-                            // Trigger payment automatically
-                            await handlePayment();
+                            // Trigger account creation automatically
+                            await handleCreateStudent();
                         }
                     } else {
                         // In dossier mode: trigger download
@@ -593,7 +594,7 @@ export default defineComponent({
                             showFeeWaiverModal.value = true;
                         } else {
                             isDownloaded.value = true;
-                            showNotification('success', 'Dossier downloaded! You can now proceed to pay the application fee.');
+                            showNotification('success', 'Dossier downloaded! You can now proceed to create your account.');
                         }
                     }
 
@@ -738,7 +739,7 @@ export default defineComponent({
             });
         };
 
-        const handlePayment = async () => {
+        const handleCreateStudent = async () => {
             if (!validateForm()) return;
 
             notification.message = '';
@@ -773,176 +774,39 @@ export default defineComponent({
             }
 
             // Open the Status Modal in processing mode only AFTER validation passes
-            await openStatusModal('processing', 'Initializing payment...');
+            isProcessingStudent.value = true;
+            await openStatusModal('processing', 'Creating your account...');
 
             try {
-                // 2. Initialize Payment
-                const res: any = await $fetch("/api/start-payment", {
-                    method: "POST",
-                    body: {
-                        user_id: null,
-                        name: form.name,
-                        email: form.email,
-                        mobile: form.phone,
-                        city: form.city,
-                        state: form.state,
-                        form_type: 2,
-                        form_id: formId.value
+                const studentRes: any = await $fetch(
+                    `${config.public.apiBase}/api/users/create_student/`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: {
+                            "full_name": form.name,
+                            "email": form.email,
+                            "city": form.city,
+                            "state": form.state,
+                            "country": "India",
+                            "phone1": form.phone
+                        },
                     }
+                );
+                
+                resetForm();
+                await closeStatusModal();
+                await closeDossierModal();
+                isProcessingStudent.value = false;
+                return navigateTo({
+                    path: '/thank-you',
+                    query: { payment_id: 'SKIP_PAYMENT' }
                 });
-
-                if (!res.success) {
-                    await closeStatusModal();
-                    showNotification('error', res.message || 'Payment initiation failed');
-                    return;
-                }
-
-                if (res.gateway === 'razorpay') {
-                    // 3. Load Razorpay JS SDK
-                    const loaded = await loadRazorpayScript();
-                    if (!loaded || !(window as any).Razorpay) {
-                        await closeStatusModal();
-                        alert("Razorpay SDK failed to load");
-                        return;
-                    }
-
-                    // 4. Open Razorpay Checkout
-                    const options = {
-                        key: res.key,
-                        amount: res.amount * 100,
-                        currency: res.currency,
-                        name: "KCGlobed GCC",
-                        description: "Application Fee",
-                        order_id: res.order_id,
-                        handler: async (response: any) => {
-                            await openStatusModal('processing', 'Verifying payment...');
-                            try {
-                                await $fetch("/api/complete-payment", {
-                                    method: "POST",
-                                    body: {
-                                        razorpay_order_id: response.razorpay_order_id,
-                                        razorpay_payment_id: response.razorpay_payment_id,
-                                        razorpay_signature: response.razorpay_signature
-                                    }
-                                });
-                                await postPaymentSuccess(res.order_id);
-                                await closeDossierModal();
-                            } catch (e) {
-                                await closeStatusModal();
-                                showAlert('Payment Error', 'Payment verification failed. Please contact support.', 'error');
-                            }
-                        },
-                        prefill: {
-                            name: form.name,
-                            email: form.email,
-                            contact: form.phone
-                        },
-                        theme: {
-                            color: "#8A2BE2"
-                        },
-                        modal: {
-                            ondismiss: async () => {
-                                console.log("Razorpay payment dismissed");
-                                try {
-                                    await $fetch("/api/report-payment-failure", {
-                                        method: "POST",
-                                        body: {
-                                            razorpay_order_id: res.order_id,
-                                            error_description: "Payment cancelled by user"
-                                        }
-                                    });
-                                } catch (e) { console.error("Failed to report failure:", e); }
-                            }
-                        }
-                    };
-
-                    const rzp = new (window as any).Razorpay(options);
-                    rzp.on('payment.failed', async (response: any) => {
-                        try {
-                            await $fetch("/api/report-payment-failure", {
-                                method: "POST",
-                                body: {
-                                    razorpay_order_id: res.order_id,
-                                    razorpay_payment_id: response.error.metadata.payment_id,
-                                    error_code: response.error.code,
-                                    error_description: response.error.description,
-                                    error_source: response.error.source,
-                                    error_step: response.error.step,
-                                    error_reason: response.error.reason
-                                }
-                            });
-                        } catch (e) { console.error("Failed to report failure:", e); }
-                    });
-
-                    rzp.open();
-                    await closeDossierModal();
-                    await closeStatusModal();
-
-                } else {
-                    // DEFAULT: CASHFREE
-                    // 3. Load Cashfree JS SDK
-                    const loaded = await loadCashfreeScript();
-                    if (!loaded || !(window as any).Cashfree) {
-                        await closeStatusModal();
-                        alert("Cashfree SDK failed to load");
-                        return;
-                    }
-
-                    // 4. Open Cashfree Checkout
-                    const cfMode = res.environment === 'PRODUCTION' ? 'production' : 'sandbox';
-                    const cashfree = (window as any).Cashfree({ mode: cfMode });
-
-                    // Close Modals before Cashfree starts explicitly, like Razorpay
-                    await closeDossierModal();
-                    await closeStatusModal();
-
-                    cashfree.checkout({
-                        paymentSessionId: res.payment_session_id,
-                        redirectTarget: "_modal"
-                    }).then(async (result: any) => {
-                        restoreBodyScroll();
-
-                        if (result.error) {
-                            console.error("[PAYMENT] Cashfree error:", result.error);
-                            try {
-                                await $fetch("/api/report-payment-failure", {
-                                    method: "POST",
-                                    body: {
-                                        cf_order_id: res.cf_order_id,
-                                        cf_payment_id: result.error?.payment_id || null,
-                                        error_code: result.error?.code,
-                                        error_description: result.error?.message,
-                                        error_source: result.error?.source
-                                    }
-                                });
-                            } catch (e) { console.error("Failed to report failure:", e); }
-
-                        } else if (result.paymentDetails) {
-                            // RE-OPEN Status Modal to show progress
-                            await openStatusModal('processing', 'Verifying payment...');
-
-                            try {
-                                // 5. Verify Payment
-                                await $fetch("/api/complete-payment", {
-                                    method: "POST",
-                                    body: {
-                                        cf_order_id: res.cf_order_id
-                                    }
-                                });
-                                await postPaymentSuccess(res.cf_order_id);
-                            } catch (e) {
-                                await closeStatusModal();
-                                console.error("[PAYMENT] complete-payment error:", e);
-                                showAlert('Payment Error', 'Payment verification failed. Please contact support.', 'error');
-                            }
-                        }
-                    });
-                }
-
             } catch (err) {
                 await closeStatusModal();
                 console.error(err);
-                showNotification('error', 'Payment initiation failed');
+                isProcessingStudent.value = false;
+                showNotification('error', 'Account creation failed');
             }
         };
 
@@ -976,9 +840,9 @@ export default defineComponent({
             onStateChange,
             isSubmitting,
             isDownloaded,
-            isPaymentInProgress,
+            isProcessingStudent,
             submitForm,
-            handlePayment,
+            handleCreateStudent,
             closeModalBtn,
             notification,
             paymentStatus,
