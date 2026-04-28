@@ -29,14 +29,14 @@
         <div class="right-panel">
           <div class="badge">✦ Confirmed</div>
 
-          <h1 class="heading">Payment <span class="yellow">Successful!</span></h1>
+          <h1 class="heading">{{ paymentId === 'SKIP_PAYMENT' ? 'Application' : 'Payment' }} <span class="yellow">Successful!</span></h1>
 
           <p class="desc">
-            Your payment has been processed successfully.<br>
+            {{ paymentId === 'SKIP_PAYMENT' ? 'Your application has been processed successfully.' : 'Your payment has been processed successfully.' }}<br>
             A confirmation email will be sent to your registered email address.
           </p>
 
-          <div v-if="paymentId" class="ref-box">
+          <div v-if="paymentId && paymentId !== 'SKIP_PAYMENT'" class="ref-box">
             <span class="ref-label">Payment ID:</span>
             <span class="ref-value">#{{ paymentId }}</span>
           </div>
