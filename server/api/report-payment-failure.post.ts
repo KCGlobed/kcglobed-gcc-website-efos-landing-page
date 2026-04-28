@@ -1,24 +1,21 @@
-// ── CASHFREE: active (cashfree-pg v5) ────────────────────────────────────────
 import { createCashfreeInstance } from "../utils/cashfree";
+import { createRazorpayInstance } from "../utils/razorpay";
 import { savePayment } from "../services/payment.service";
 import { sendPaymentFailureEmail } from "../services/email.service";
 
 // Helper: extract form_id from order_id string (e.g. "cf_322_1772694830212" → "322")
 function extractFormIdFromOrderId(orderId: string): string | null {
     const parts = orderId.split('_');
-    if (parts.length >= 3) {
+    if (parts.length >= 2) {
         const extracted = parts[1];
-        if (extracted && extracted !== 'guest' && extracted !== 'null') return extracted;
+        if (extracted && extracted !== 'guest' && extracted !== 'null' && !isNaN(Number(extracted))) return extracted;
     }
     return null;
 }
 
-// ── RAZORPAY: disabled (kept for reference) ───────────────────────────────────
-// import Razorpay from "razorpay";
-
 export default defineEventHandler(async (event) => {
     const body = await readBody(event);
-
+    
     // ── RAZORPAY & CASHFREE fields ───────────────────────────────────────────
     const { 
         cf_order_id, cf_payment_id, 
@@ -51,7 +48,7 @@ export default defineEventHandler(async (event) => {
     });
 
     const config = useRuntimeConfig(event);
-
+    const sourceValue = process.env.SOURCE || process.env.NUXT_PUBLIC_SOURCE || config.source;
     // Default context
     let userId: string | null = null;
     let formType: string | null = null;
@@ -137,7 +134,8 @@ export default defineEventHandler(async (event) => {
             amount,
             currency,
             status: "failed",
-            response: JSON.stringify({ ...body, source: "client_report", gateway })
+            response: JSON.stringify({ ...body, source: "client_report", gateway }),
+            source: Number(sourceValue || 5)
         });
 
         // --- LOG: Failure Recorded Successfully ---
@@ -184,9 +182,9 @@ export default defineEventHandler(async (event) => {
     } catch (saveError: any) {
         console.error("[PAYMENT][failure] ERROR — Could not save failure record to DB", {
             event: "client_report_save_error",
-            gateway: "cashfree",
-            cf_order_id,
-            cf_payment_id: cf_payment_id || null,
+            gateway: razorpay_order_id ? "razorpay" : "cashfree",
+            order_id: orderId,
+            payment_id: paymentId || null,
             error_message: saveError?.message || saveError,
             timestamp: new Date().toISOString()
         });

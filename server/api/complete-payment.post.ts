@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     const config = useRuntimeConfig(event);
     const activeGateway = config.paymentGateway || 'RAZORPAY';
-
+    const sourceValue = process.env.SOURCE || process.env.NUXT_PUBLIC_SOURCE || config.source;
     let userId: string | null = null;
     let formType: string | null = null;
     let formId: string | null = null;
@@ -137,11 +137,22 @@ export default defineEventHandler(async (event) => {
                 payment_id: actualPaymentId,
                 email: userEmail
             });
+            if (successPayment.payment_amount !== undefined) {
+                amount = Number(successPayment.payment_amount); // real-time paid amount
+            }
         } catch (error: any) {
             if (error.statusCode) throw error;
             console.error("[PAYMENT][complete] Error verifying Cashfree payment", error);
             throw createError({ statusCode: 500, message: "Failed to verify Cashfree payment" });
         }
+    }
+
+    const baseAmount = Number(config.paymentAmount || 2950);
+    let feeWaiverCategory = "No Waiver";
+    if (amount === 1 || amount === 0 || amount === 2) {
+        feeWaiverCategory = "Free of cost (FOC)";
+    } else if (amount < baseAmount) {
+        feeWaiverCategory = "20% Fee Waiver";
     }
 
     // ── Save success to DB ────────────────────────────────────────────────────
@@ -163,7 +174,9 @@ export default defineEventHandler(async (event) => {
                 email: userEmail,
                 mobile: userMobile,
                 city, state
-            })
+            }),
+            source: Number(sourceValue || 5),
+            fee_waiver_category: feeWaiverCategory
         });
 
         // Optional: send confirmation email logic here

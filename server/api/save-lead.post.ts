@@ -3,7 +3,8 @@ import { savePayment } from "../services/payment.service";
 export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     const { name, email, mobile, state, city, form_type, form_id, action } = body;
-
+    const config = useRuntimeConfig(event);
+    const sourceValue = process.env.SOURCE || process.env.NUXT_PUBLIC_SOURCE || config.source;
     const intentId = `intent_${form_id || Date.now()}`;
     console.log("[LEAD][click] CTA clicked — saving lead", {
         action, name, email, mobile, state, city, form_type, form_id,
@@ -33,7 +34,8 @@ export default defineEventHandler(async (event) => {
                 source: "cta_click", action,
                 name, email, mobile, state, city,
                 timestamp: new Date().toISOString()
-            })
+            }),
+            source: Number(sourceValue || 5)
         });
 
         console.log("[LEAD][click] Lead saved to DB", {

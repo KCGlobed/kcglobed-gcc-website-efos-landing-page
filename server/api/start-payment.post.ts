@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
                 amount: amount * 100, // Razorpay takes amount in paisa
                 currency,
                 receipt: `rcpt_${user_id || form_id || 'guest'}_${Date.now()}`,
-                notes: { user_id, form_type, form_id, name, email, mobile, city, state }
+                notes: { user_id, form_type, form_id, name, email, mobile, city, state },
             };
 
             const order = await razorpay.orders.create(orderOptions);
