@@ -3,6 +3,7 @@ import { pool } from '../utils/db';
 export async function savePayment(data: any) {
   const query = `
     INSERT INTO payments (
+      re_attempt_status,
       form_type,
       form_id,
       razorpay_order_id,
@@ -13,10 +14,11 @@ export async function savePayment(data: any) {
       status,
       response,
       dossier_form_id,
-      source
+      source,
+      fee_waiver_category
     )
     VALUES (
-      $1, $2, $3, $4, $5, $6, $7, $8, $9,$10,$11
+      $1, $2, $3, $4, $5, $6, $7, $8, $9,$10,$11,$12,$13
     )
     RETURNING id
   `;
@@ -32,6 +34,7 @@ export async function savePayment(data: any) {
   });
 
   const values = [
+    false,
     data.form_type ?? null,
     data.form_id ?? null,
     data.razorpay_order_id,
@@ -42,7 +45,8 @@ export async function savePayment(data: any) {
     data.status || 'success',
     data.response,
     data.form_id,
-    Number(sourceValue || 1)
+    Number(data.source || sourceValue || 1),
+    data.fee_waiver_category || 'No Waiver'
   ];
 
   const result = await pool.query(query, values);

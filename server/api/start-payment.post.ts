@@ -7,14 +7,14 @@ export default defineEventHandler(async (event) => {
     const { user_id, name, email, mobile, form_type, form_id, city, state } = body;
     const config = useRuntimeConfig(event);
 
-    const activeGateway = config.paymentGateway || 'RAZORPAY';
+    const activeGateway = config.paymentGateway || 'CASHFREE';
 
     console.log(`[PAYMENT][start] Initiating payment via ${activeGateway}`, {
         user_id, name, email, mobile, form_type, form_id,
         timestamp: new Date().toISOString()
     });
 
-    const amount = activeGateway === 'RAZORPAY' 
+    const amount = activeGateway === 'RAZORPAY'
         ? Number(process.env.RAZORPAY_PAYMENT_AMOUNT || config.razorpayAmount || 2950)
         : Number(process.env.CASHFREE_PAYMENT_AMOUNT || config.cashfreePaymentAmount || 2950);
     const currency = process.env.RAZORPAY_CURRENCY || config.razorpayCurrency || 'INR';
@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
                 amount: amount * 100, // Razorpay takes amount in paisa
                 currency,
                 receipt: `rcpt_${user_id || form_id || 'guest'}_${Date.now()}`,
-                notes: { user_id, form_type, form_id, name, email, mobile, city, state }
+                notes: { user_id, form_type, form_id, name, email, mobile, city, state },
             };
 
             const order = await razorpay.orders.create(orderOptions);
@@ -60,6 +60,7 @@ export default defineEventHandler(async (event) => {
         let cfEnvironment: string;
         try {
             const cf = createCashfreeInstance(config, event);
+            console.log(cf, '---this is cf----')
             cashfree = cf.instance;
             cfEnvironment = cf.cfEnvironment;
         } catch (e: any) {
