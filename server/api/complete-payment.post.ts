@@ -151,7 +151,11 @@ export default defineEventHandler(async (event) => {
     if (amount === 1 || amount === 0 || amount === 2) {
         feeWaiverCategory = "Free of cost (FOC)";
     } else if (amount < baseAmount) {
-        feeWaiverCategory = "20% Fee Waiver";
+        const waiverPercent = Math.round(
+            ((baseAmount - amount) / baseAmount) * 100
+        );
+
+        feeWaiverCategory = `${waiverPercent}% Fee Waiver`;
     }
 
     // ── Save success to DB ────────────────────────────────────────────────────
