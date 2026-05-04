@@ -26,9 +26,13 @@
       <div class="modal-body" v-if="!isSuccess && !isSubmitting">
         <h1 class="title">CONGRATULATIONS!</h1>
         <p class="subtitle">
-          GCC School has partnered with your institution/university.
-          Your registration fee for the 1st attempt is <strong>waived off</strong>, and
-          you can now apply with no fees.
+          GCC School has partnered with your institution/university. Your registration fee for the first attempt has
+          been waived off, and you can now apply with no fees.
+        </p>
+
+        <p class="subtitle" style="margin-top: 10px; margin-bottom: 0;">
+          <strong>Please note:</strong> This benefit is exclusively available to final-year students of the institution.
+          It is not applicable to graduates or alumni of the respective institution.
         </p>
 
         <hr class="divider" />
@@ -69,6 +73,10 @@
           <span v-if="uploadError" class="error-msg">{{ uploadError }}</span>
         </div>
 
+        <p class="subtitle" style="font-size: 13px; margin-bottom: 10px;">
+          After submission of the ID Card/Detailed Marks Certificate, once approved, you will receive an email.
+        </p>
+
         <!-- Terms -->
         <div class="terms-row" @click="agreed = !agreed; formError = ''">
           <div class="checkbox" :class="{ checked: agreed }">
@@ -79,8 +87,10 @@
           </div>
           <span class="terms-text">
             By submitting, you agree to our
-            <a href="#" class="terms-link" @click.stop>Terms</a> and
-            <a href="#" class="terms-link" @click.stop>Privacy Policy</a>.
+            <NuxtLink to="/terms-conditions" target="_blank" class="terms-link" @click.stop>Terms</NuxtLink> and
+            <NuxtLink to="/privacy-policy" target="_blank" class="terms-link" @click.stop>Privacy Policy</NuxtLink>, and
+            confirm
+            that you are a final-year student of the respective institution (not a graduate/alumni).
           </span>
         </div>
 
@@ -282,16 +292,16 @@ async function handleSubmit() {
 
 .modal-header {
   background: #12082a;
-  padding: 32px 24px 26px;
+  padding: 20px 20px 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
+  gap: 12px;
 }
 
 .icon-ring {
-  width: 76px;
-  height: 76px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   background: #ede9ff;
   display: flex;
@@ -315,7 +325,7 @@ async function handleSubmit() {
 }
 
 .modal-body {
-  padding: 23px 23px 24px;
+  padding: 16px 20px 18px;
 }
 
 .title {
@@ -368,7 +378,7 @@ async function handleSubmit() {
   border: 1.5px dashed #d0d0d0;
   border-radius: 10px;
   background: #f9f9f9;
-  padding: 23px 20px;
+  padding: 16px 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
