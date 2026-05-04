@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
             process.env.RAZORPAY_PAYMENT_AMOUNT || 
             process.env.CASHFREE_PAYMENT_AMOUNT || 
             config.cashfreePaymentAmount || 
-            249
+            2950
         );
 
         const id = await savePayment({
