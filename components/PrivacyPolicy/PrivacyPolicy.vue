@@ -9,30 +9,25 @@
         <div class="main-content">
           <p>
             This privacy statement discloses the privacy practices of KC Global Edutech Private Limited, (owner of the
-            brand KC GlobEd) for the website located at <NuxtLink to="https://www.kcglobed.com" target="_blank">
-              https://www.kcglobed.com
-            </NuxtLink> (the “Site”), related services, and
-            Email communication to @ info@kcglobed.com domain, and other websites on the subdomain of www.kcglobed.com,
-            and its corporate affiliates (collectively, the “Service”).
+            brand KC GlobEd and GCC School) for the website located at <NuxtLink to="https://www.gccschool.com"
+              target="_blank">https://www.gccschool.com</NuxtLink> (the “Site”), related
+            services, and Email communication to @ info@gccschool.com domain.
           </p>
           <p>
-            Protecting your privacy is our top priority at KC GlobEd. Through this privacy policy, we aim to explain the
-            ways in which your personal and business information is collected, used and protected at KC GlobEd. This
-            privacy policy is a part of our <NuxtLink target="_blank" to="https://edumontclasses.com/terms-of-use/">
-              Terms
-              of Use
-            </NuxtLink>.
+            Protecting your privacy is our top priority at GCC School. Through this privacy policy, we aim to explain
+            the ways in which your personal and business information is collected, used and protected at GCC School.
+            This privacy policy is a part of our Terms of Use.
           </p>
           <p>
-            By visiting the website of KC GlobEd, we take it as consent to collect your information in accordance with
+            By visiting the website of GCC School, we take it as consent to collect your information in accordance with
             this Privacy Policy and also take it as acceptance from your end. we assure you that we do not sell, rent,
             transfer your information to any third party in any way than what is stated in the Privacy Policy.
           </p>
           <p>
             You must understand that our services may be associated with certain other third parties as well, and the
-            conditions and privacy like online storage services and payment providers, and you agree that KC GlobEd is
+            conditions and privacy like online storage services and payment providers, and you agree that GCC School is
             not responsible for any such third-party terms and conditions and their use of any of your information. This
-            policy is strictly with the use of information collected by KC GlobEd.
+            policy is strictly with the use of information collected by GCC School.
           </p>
         </div>
         <div class="main-content">
@@ -41,11 +36,11 @@
             <p>
               On our website, we collect two types of information:
             </p>
-
             <ol class="">
               <li>
                 Personally Identifiable Information (PII) such as Name, Email Id, Phone No, Address, Qualification and
                 Company Name, Institution Name, etc.
+
               </li>
               <li>Non-PII which doesn’t reveal the identity of the visitor on our site. This includes:</li>
               <ol type="a">
@@ -60,13 +55,13 @@
                   our servers.
                 </li>
                 <li>
-                  <b>Payment Information</b> - We do not collect any credit card information
-                  to protect you against any unauthorized transactions. claims and other liabilities. We allow
-                  third-party vendors to collect information for the purpose of collecting the fee from our customers on
-                  our website. We do not have any access to the payment information that you provide to our third-party
-                  vendors and all this information provided is subject to the privacy policy and the terms and
-                  conditions of the third party vendor. For more information, you may want to read the
-                  terms and conditions and the privacy policy of our payment service providers
+                  <b>Payment Information</b> - We do not collect any credit card information to protect you against any
+                  unauthorized transactions. claims and other liabilities. We allow third-party vendors to collect
+                  information for the purpose of collecting the fee from our customers on our website. We do not have
+                  any access to the payment information that you provide to our third-party vendors and all this
+                  information provided is subject to the privacy policy and the terms and conditions of the third party
+                  vendor. For more information, you may want to read the terms and conditions and the privacy policy of
+                  our payment service providers.
                 </li>
               </ol>
             </ol>
@@ -97,8 +92,7 @@
           <div class="content">
             <h4>How your information is protected</h4>
             <p>
-              You agree that KC GlobEd and its associated companies may use the Information for marketing and
-              promotional purposes.
+              You agree that GCC School may use the Information for marketing and promotional purposes.
             </p>
             <ol>
               <li>
@@ -106,15 +100,18 @@
                 provide explicit confidentiality protections. Any employee, independent contractor or agent who violates
                 such privacy and/or security policies is subject to possible termination and civil and/or criminal
                 prosecution.
+
               </li>
               <li>
                 We do not make any of your Information available to third parties for their marketing purposes. No data
                 given or collected is shared with other social media platforms.
+
               </li>
               <li>
                 If however, we share your Business Information with third parties, we will notify you. Please note that
                 no transmission over the internet can guarantee confidentiality and non-disclosure, and as such, you
                 transmit at your own risk.
+
               </li>
               <li>
                 We use robust security measures to protect data from unauthorized access, maintain data accuracy, and
@@ -122,19 +119,22 @@
                 Socket Layer (SSL) technology protects your Information, using both server authentication and data
                 encryption. These technologies help ensure that your Information is safe, secure, and only available to
                 you and to whom you have granted access.
+
               </li>
               <li>
-                We do not tolerate Spam. To report KC GlobEd related spam, please contact us at info@kcglobed.com. You
+                We do not tolerate Spam. To report GCC School related spam, please contact us at info@gccschool.com. You
                 may not use our communication tools to send spam or otherwise send content that would violate our terms
                 of use. We may check for spam, viruses, phishing attacks, and other malicious activity or illegal or
                 prohibited content of the Website, but we will not permanently store messages sent through these tools.
+
               </li>
               <li>
-                KC GlobEd does its utmost to secure communications and data storage in order to protect the
+                GCC School does its utmost to secure communications and data storage in order to protect the
                 confidentiality of your Information against loss and interception by third parties. However, it is
                 important to know that there is no zero-risk against loss or interception by others of your Information.
                 You are responsible for maintaining the security and confidentiality of your Account’s username and
-                password.
+                password. 
+
               </li>
             </ol>
           </div>
@@ -144,12 +144,13 @@
               Cookies Policy
             </h4>
             <p>
-              KC GlobEd uses cookies to give you a great browsing experience. Whenever you visit our website, our server
-              sends a cookie to your device in order to determine your location and use an appropriate language for you.
-              You are free to delete these cookies at any time. Cookies do not have the capacity to personally identify
-              an individual and they can at the most merely identify the web browser. Unless an individual chooses to
-              identify himself by opening an account or entering login information, the user will remain anonymous to
-              us.
+              GCC School uses cookies to give you a great browsing experience. Whenever you visit our website, our
+              server sends a cookie to your device in order to determine your location and use an appropriate language
+              for you. You are free to delete these cookies at any time.  Cookies do not have the capacity to personally
+              identify an individual and they can at the most merely identify the web browser. Unless an individual
+              chooses to identify himself by opening an account or entering login information, the user will remain
+              anonymous to us.
+
             </p>
           </div>
           <div class="content">
@@ -163,6 +164,7 @@
               website usage history, on your authorization, with or without a legal order. We will not disclose any of
               your other information to any agency without a court order except when it becomes necessary for any
               safety, security or a similar concern.
+
             </p>
           </div>
           <div class="content">
@@ -179,8 +181,8 @@
             </h4>
             <p>
               By using our Website, you consent to the collection and use of your Information as described in this
-              Privacy Policy and our <NuxtLink to="https://edumontclasses.com/terms-of-use/" target="_blank">terms of
-                use</NuxtLink>.
+              Privacy Policy and our terms of use.
+
             </p>
           </div>
         </div>
@@ -192,6 +194,7 @@
               responsibility or liability for the content and activities of these third-party sites. We encourage you to
               be aware when you leave our Website to read the privacy policies of each and every website that collects
               personal information. This privacy policy applies only to information collected by this Website.
+
             </p>
           </div>
           <div class="content">
@@ -202,6 +205,7 @@
               If our Privacy Policy procedures change, we will post those changes immediately to our Website. Any such
               changes will be effective immediately from the time they are posted unless otherwise stated in the change
               provision. An email notification will be sent to the users who request it.
+
             </p>
           </div>
           <div class="content">
@@ -212,18 +216,19 @@
               You have ‘right to access’ your personal information from the website for any purpose. You can get and
               reuse your personal information across any services at any time. Whereas you have provided us with
               consent, you have the right to withdraw this consent at any time. To reiterate, you can do this at any
-              time by contacting us directly at info@kcglobed.com
+              time by contacting us directly at info@gccschool.com
+
             </p>
           </div>
           <div class="content">
             <h4>
               How to modify the information or opt-out of updates?
             </h4>
-            <p>
             <ol>
               <li>
                 You may use the following options for removing your information from our email database if you wish to
                 opt out of receiving promotional emails and newsletters
+
               </li>
               <li>
                 Click on the “unsubscribe” link on the bottom of the email.
@@ -232,12 +237,10 @@
                 Click on the “Account Settings” link from the site home page, and un-check the undesired promotions.
               </li>
               <li>
-                Send mail to the following postal address letting us know which promotional emails you wish to opt-out
-                of: KC Global Edutech Private Limited, 63, Second Floor, Satya Niketan, South Delhi, New Delhi – 110021,
-                India.
+                Send an e-mail to letting us know which promotional emails you wish to opt-out of at info@gccshool.com.
+
               </li>
             </ol>
-            </p>
           </div>
         </div>
       </div>

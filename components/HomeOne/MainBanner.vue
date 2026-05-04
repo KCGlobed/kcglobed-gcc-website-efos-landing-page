@@ -6,7 +6,7 @@
     }" :modules="[SwiperEffectFade, SwiperPagination]" class="hero-slider">
       <SwiperSlide v-for="banner in banners" :key="banner.id">
         <div class="hero-slider-warp" :style="{
-          'background-image': `url(${config.public.jointBrandHomeBanner})`,
+          'background-image': `url(${banner.image})`,
         }">
           <div class="container-fluid">
             <div class="row align-items-center">

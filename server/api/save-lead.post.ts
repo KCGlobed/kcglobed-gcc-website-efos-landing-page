@@ -12,6 +12,7 @@ export default defineEventHandler(async (event) => {
 
     try {
         const config = useRuntimeConfig(event);
+        const source = config.source;
         const amount = Number(
             process.env.RAZORPAY_PAYMENT_AMOUNT || 
             process.env.CASHFREE_PAYMENT_AMOUNT || 
@@ -33,7 +34,8 @@ export default defineEventHandler(async (event) => {
                 source: "cta_click", action,
                 name, email, mobile, state, city,
                 timestamp: new Date().toISOString()
-            })
+            }),
+            source: source
         });
 
         console.log("[LEAD][click] Lead saved to DB", {
