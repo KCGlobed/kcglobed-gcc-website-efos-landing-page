@@ -263,10 +263,6 @@
 
                             <p class="celebration-welcome">🏫 Welcome to <strong>GCC School</strong> — Your Gateway to Global Finance Careers.</p>
                         </div>
-
-                        <button class="celebration-cta" @click="handleCelebrationCta">
-                            Got it, Continue <i class="ti ti-arrow-right ms-2"></i>
-                        </button>
                     </div>
                 </div>
             </div>
@@ -379,7 +375,7 @@ export default defineComponent({
 
         const handleCelebrationCta = () => {
             showCelebrationPopup.value = false;
-            window.location.href = '/myaccount';
+            // window.location.href = '/myaccount';
         };
 
         const auth = useAuth();
@@ -532,7 +528,7 @@ export default defineComponent({
                             full_name: form.name,
                             email: form.email,
                             phone: form.phone,
-                            source: config.public.source || 2,
+                            source: config.public.source ,
                             source_form: props.mode === 'apply' ? 1 : 2,
                             utm_source: utm_source.value,
                             utm_medium: utm_medium.value,
@@ -637,7 +633,7 @@ export default defineComponent({
                     state: form.state,
                     city: form.city,
                     university: form.university,
-                    source: config.public.source || 2,
+                    source: config.public.source,
                     source_form: props.mode === 'apply' ? 1 : 2,
                     utm_source: utm_source.value,
                     utm_medium: utm_medium.value,
@@ -867,12 +863,9 @@ export default defineComponent({
                         paymentId.value = pid;
                         processingMessage.value = 'Payment Successful! Redirecting to profile...';
                         resetForm();
-                        setTimeout(() => {
-                            window.location.href = '/myaccount';
-                        }, 3000);
                     } else {
                         await closeStatusModal();
-                        window.location.href = '/myaccount';
+                        // window.location.href = '/myaccount';
                     }
                 }
             } catch (regErr: any) {
@@ -885,12 +878,12 @@ export default defineComponent({
                     paymentStatus.value = 'success';
                     paymentId.value = pid;
                     processingMessage.value = 'Payment Successful! Redirecting to profile...';
-                    setTimeout(() => {
-                        window.location.href = '/myaccount';
-                    }, 3000);
+                    // setTimeout(() => {
+                    //     window.location.href = '/myaccount';
+                    // }, 3000);
                 } else {
                     await closeStatusModal();
-                    window.location.href = '/myaccount';
+                    // window.location.href = '/myaccount';
                 }
             }
         };
@@ -931,12 +924,12 @@ export default defineComponent({
                         paymentId.value = pid;
                         processingMessage.value = 'Successfully registered! Redirecting to profile...';
 
-                        setTimeout(() => {
-                            window.location.href = '/myaccount';
-                        }, 3000);
+                        // setTimeout(() => {
+                        //     window.location.href = '/myaccount';
+                        // }, 3000);
                     } else {
                         await closeStatusModal();
-                        window.location.href = '/myaccount';
+                        // window.location.href = '/myaccount';
                     }
                 } else {
                     console.error("[AUTOLOGIN] Login failed - No token received");
@@ -1702,4 +1695,3 @@ export default defineComponent({
     opacity: 1;
 }
 </style>
-ß
