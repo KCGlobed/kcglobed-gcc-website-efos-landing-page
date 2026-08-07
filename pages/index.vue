@@ -21,14 +21,10 @@
     <CommonCampus />
     <LayoutMainFooter />
     <LayoutCopyRight />
-
-    <!-- Event Popup -->
-    <!-- <CommonEventPopup /> -->
   </div>
+
 </template>
-
 <script setup lang="ts">
-
 useHead({
   title: "GCC School: Get Hired First, Then Trained",
   meta: [
@@ -62,5 +58,4 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe>`,
     }
   ]
 })
-
 </script>

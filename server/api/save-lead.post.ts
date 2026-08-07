@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
                 name, email, mobile, state, city,
                 timestamp: new Date().toISOString()
             }),
-            source:4
+            source: 2
         });
 
         console.log("[LEAD][click] Lead saved to DB", {

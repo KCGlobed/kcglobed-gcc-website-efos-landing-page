@@ -139,12 +139,27 @@ export default defineEventHandler(async (event) => {
                 payment_id: actualPaymentId,
                 email: userEmail
             });
+            if (successPayment.payment_amount !== undefined) {
+                amount = Number(successPayment.payment_amount); // real-time paid amount
+            }
         } catch (error: any) {
             if (error.statusCode) throw error;
             console.error("[PAYMENT][complete] Error verifying Cashfree payment", error);
             throw createError({ statusCode: 500, message: "Failed to verify Cashfree payment" });
         }
     }
+    const baseAmount = Number(config.paymentAmount || 2950);
+    let feeWaiverCategory = "No Waiver";
+    if (amount === 1 || amount === 0 || amount === 2) {
+        feeWaiverCategory = "Free of cost (FOC)";
+    } else if (amount < baseAmount) {
+        const waiverPercent = Math.round(
+            ((baseAmount - amount) / baseAmount) * 100
+        );
+
+        feeWaiverCategory = `${waiverPercent}% Fee Waiver`;
+    }
+
 
     const baseAmount = Number(config.paymentAmount || 2950);
     let feeWaiverCategory = "No Waiver";
@@ -178,8 +193,9 @@ export default defineEventHandler(async (event) => {
                 mobile: userMobile,
                 city, state
             }),
-            source: 4,
+            source: 2,
             fee_waiver_category: feeWaiverCategory
+
         });
 
         // Optional: send confirmation email logic here
