@@ -148,17 +148,17 @@ export default defineEventHandler(async (event) => {
             throw createError({ statusCode: 500, message: "Failed to verify Cashfree payment" });
         }
     }
-    const baseAmount = Number(config.paymentAmount || 2950);
-    let feeWaiverCategory = "No Waiver";
-    if (amount === 1 || amount === 0 || amount === 2) {
-        feeWaiverCategory = "Free of cost (FOC)";
-    } else if (amount < baseAmount) {
-        const waiverPercent = Math.round(
-            ((baseAmount - amount) / baseAmount) * 100
-        );
+    // const baseAmount = Number(config.paymentAmount || 2950);
+    // let feeWaiverCategory = "No Waiver";
+    // if (amount === 1 || amount === 0 || amount === 2) {
+    //     feeWaiverCategory = "Free of cost (FOC)";
+    // } else if (amount < baseAmount) {
+    //     const waiverPercent = Math.round(
+    //         ((baseAmount - amount) / baseAmount) * 100
+    //     );
 
-        feeWaiverCategory = `${waiverPercent}% Fee Waiver`;
-    }
+    //     feeWaiverCategory = `${waiverPercent}% Fee Waiver`;
+    // }
 
 
     const baseAmount = Number(config.paymentAmount || 2950);
