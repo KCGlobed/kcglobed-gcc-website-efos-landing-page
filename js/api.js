@@ -17,7 +17,7 @@ if (window.location.hostname.includes("gccschool.com")) {
 export const CONFIG = {
     BACKEND_API_BASE: GCC_BACKEND_URL,
     LOCAL_API_BASE: BASE_URL,
-    SOURCE: 3
+    SOURCE: 4
 };
 
 async function request(url, options = {}) {
