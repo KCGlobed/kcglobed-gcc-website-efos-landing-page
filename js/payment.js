@@ -224,7 +224,7 @@ export const payment = {
                             error_code: result.error.code,
                             error_description: result.error.message,
                             error_source: result.error.source,
-                            source: 4
+                            source: 5
                         });
                     } else if (result.paymentDetails) {
                         updateStatusCallback('processing', 'Verifying payment status...');
