@@ -14,6 +14,7 @@ if (window.location.hostname.includes("gccschool.com")) {
     mode = "sandbox";
 }
 
+
 export const CONFIG = {
     BACKEND_API_BASE: GCC_BACKEND_URL,
     LOCAL_API_BASE: BASE_URL,
