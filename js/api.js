@@ -1,15 +1,15 @@
 import { auth } from './utils.js';
 
-let BASE_URL = "https://kcglobed-gcc-website-932479078084.asia-south1.run.app";
+let BASE_URL = "https://gccschool.com";
 let GCC_BACKEND_URL = "https://gccwebsite-admin-backend-738131651355.asia-south1.run.app";
 let mode = "sandbox";
 
 if (window.location.hostname.includes("gccschool.com")) {
-    BASE_URL = "https://gcc-website-prod-932479078084.europe-west1.run.app";
+    BASE_URL = "https://gccschool.com";
     GCC_BACKEND_URL = "https://gccwebsite-admin-prod-backend-738131651355.asia-south1.run.app";
     mode = "production";
 } else if (window.location.hostname.includes("localhost") || window.location.hostname.includes("127.0.0.1")) {
-    BASE_URL = "https://kcglobed-gcc-website-932479078084.asia-south1.run.app";
+    BASE_URL = "https://gccschool.com";
     GCC_BACKEND_URL = "https://gccwebsite-admin-backend-738131651355.asia-south1.run.app";
     mode = "sandbox";
 }
