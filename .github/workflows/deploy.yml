@@ -1,114 +1,50 @@
-name: Deploy Application
-
+name: Deploy affiliate5
+ 
 on:
   push:
     branches:
-      - main
-
+      - affiliate5
+ 
 jobs:
-
   deploy:
-
     runs-on: ubuntu-latest
-
     steps:
-
-      ######################################################
-      # Checkout
-      ######################################################
-
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
-
-      ######################################################
-      # Setup Node
-      ######################################################
-
-      - name: Setup Node
-        if: hashFiles('package.json') != ''
+ 
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
-
-      ######################################################
-      # Install Dependencies
-      ######################################################
-
-      - name: Install Dependencies
-        if: hashFiles('package.json') != ''
-        run: npm ci
-
-      ######################################################
-      # Build React
-      ######################################################
-
-      - name: Build React
-        if: hashFiles('package.json') != ''
+          node-version: 20
+ 
+      - name: Install dependencies
+        run: npm install
+ 
+      - name: Build static frontend
         run: npm run build
-
-      ######################################################
-      # Package React
-      ######################################################
-
-      - name: Package React
-        if: hashFiles('package.json') != ''
+ 
+      - name: Package build
         run: |
           ARCHIVE="release_$(date +%Y%m%d_%H%M%S).tar.gz"
-
-          tar -czf "$ARCHIVE" \
-            -C dist \
-            .
-
+          tar -czf "$ARCHIVE" -C dist .
           echo "ARCHIVE=$ARCHIVE" >> $GITHUB_ENV
-
-      ######################################################
-      # Package Static HTML
-      ######################################################
-
-      - name: Package Static HTML
-        if: hashFiles('package.json') == ''
-        run: |
-          ARCHIVE="release_$(date +%Y%m%d_%H%M%S).tar.gz"
-
-          TEMP_DIR=$(mktemp -d)
-
-          rsync -a \
-            --exclude=".git" \
-            --exclude=".github" \
-            ./ "$TEMP_DIR/"
-
-          tar -czf "$ARCHIVE" \
-            -C "$TEMP_DIR" \
-            .
-
-          rm -rf "$TEMP_DIR"
-
-          echo "ARCHIVE=$ARCHIVE" >> $GITHUB_ENV
-
-      ######################################################
-      # Upload Package
-      ######################################################
-
-      - name: Copy Package
-        uses: appleboy/scp-action@v0.1.7
+ 
+      - name: Upload Package
+        uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           source: "${{ env.ARCHIVE }}"
-          target: "/var/www/apps/nfet-efos/releases"
-
-      ######################################################
-      # Deploy
-      ######################################################
-
-      - name: Trigger Deployment
+          target: "/var/www/apps/affiliate5/releases"
+ 
+      - name: Deploy application
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            /opt/deploy-platform/scripts/deploy.sh \
-              "nfet-efos" \
-              "${{ env.ARCHIVE }}"
+            set -e
+            echo "Deploying affiliate5..."
+            sudo /opt/deploy-platform/scripts/deploy.sh "affiliate5" "${{ env.ARCHIVE }}"

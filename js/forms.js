@@ -682,11 +682,6 @@ function setupDossierModals() {
                 const modalInstance = bootstrap.Modal.getInstance(modalEl);
                 if (modalInstance) modalInstance.hide();
 
-                // Trigger payment checkout
-                // await payment.startCheckout({
-                //     name, email, phone, city, state, formId, referralCode
-                // }, updatePaymentStatusModal);
-
                 // Show registering popup modal
                 updatePaymentStatusModal('processing', 'Please wait while we register you...');
 

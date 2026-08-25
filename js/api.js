@@ -9,7 +9,7 @@ if (window.location.hostname.includes("gccschool.com")) {
     GCC_BACKEND_URL = "https://gccwebsite-admin-prod-backend-738131651355.asia-south1.run.app";
     mode = "production";
 } else if (window.location.hostname.includes("localhost") || window.location.hostname.includes("127.0.0.1")) {
-    BASE_URL = "https://gccschool.com";
+    BASE_URL = "https://web.gccschool.com";
     GCC_BACKEND_URL = "https://gccwebsite-admin-backend-738131651355.asia-south1.run.app";
     mode = "sandbox";
 }
@@ -193,6 +193,18 @@ export const api = {
                 country: 'India',
                 phone1: phone,
                 referred_code: referralCode || ''
+            })
+        });
+    },
+
+    // 11. Auto-login student
+    async autoLogin(email, password) {
+        return request(`${CONFIG.BACKEND_API_BASE}/api/users/website_login/`, {
+            method: 'POST',
+            body: JSON.stringify({
+                email,
+                password,
+                role: 'student'
             })
         });
     },
