@@ -43,24 +43,28 @@ export const payment = {
             console.log("[Payment] Student account created:", studentRes);
 
             if (studentRes.success && studentRes.data?.password) {
-                updateStatusCallback('success', 'Signing you in automatically...');
-                
                 // 2. Perform auto-login with email and received password
-                const loginRes = await api.autoLogin(userData.email, studentRes.data.password);
-                console.log("[Payment] Automated login response:", loginRes);
+                if (typeof api.autoLogin === 'function') {
+                    updateStatusCallback('success', 'Signing you in automatically...');
+                    const loginRes = await api.autoLogin(userData.email, studentRes.data.password);
+                    console.log("[Payment] Automated login response:", loginRes);
 
-                if (loginRes.data?.token) {
-                    const { access, refresh } = loginRes.data.token;
-                    const user_role = loginRes.data.user_role ?? null;
-                    const user_id = loginRes.data.user_id ?? null;
+                    if (loginRes.data?.token) {
+                        const { access, refresh } = loginRes.data.token;
+                        const user_role = loginRes.data.user_role ?? null;
+                        const user_id = loginRes.data.user_id ?? null;
 
-                    // Save session details to LocalStorage
-                    auth.login({ access, refresh, user_role, user_id });
-                    
-                    updateStatusCallback('success', 'Successfully registered! Redirecting to profile...');
+                        // Save session details to LocalStorage
+                        auth.login({ access, refresh, user_role, user_id });
+                        
+                        updateStatusCallback('success', 'Successfully registered! Redirecting to profile...');
+                    } else {
+                        console.error("[Payment] Auto-login failed: no token returned");
+                        updateStatusCallback('success', 'Account created! Please log in manually.');
+                    }
                 } else {
-                    console.error("[Payment] Auto-login failed: no token returned");
-                    updateStatusCallback('success', 'Account created! Please log in manually.');
+                    console.warn("[Payment] api.autoLogin is not defined. Skipping auto-login.");
+                    updateStatusCallback('success', 'Registration completed');
                 }
             } else {
                 console.warn("[Payment] Student registration did not return password. Redirecting to login.");
@@ -224,7 +228,7 @@ export const payment = {
                             error_code: result.error.code,
                             error_description: result.error.message,
                             error_source: result.error.source,
-                            source: 2
+                            source: 7
                         });
                     } else if (result.paymentDetails) {
                         updateStatusCallback('processing', 'Verifying payment status...');
