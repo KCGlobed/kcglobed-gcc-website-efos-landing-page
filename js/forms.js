@@ -217,7 +217,6 @@ function setupEnquiryForm() {
             college, source, remarks, pincode
         };
 
-        
         const submitBtn = form.querySelector('button[type="submit"]');
         const spinner = submitBtn.querySelector('.spinner-border');
         

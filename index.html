@@ -1885,6 +1885,32 @@
     </div>
 
     <!-- ── Payment Processing Status Modal ── -->
+    <!-- <div class="modal fade" id="paymentStatusModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
+        aria-hidden="true" style="z-index: 999999;">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-center p-4 position-relative">
+                <button type="button" class="btn-close position-absolute top-0 end-0 m-3 d-none" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+                <div class="modal-body">
+                    <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+
+                    <div class="success-icon text-success d-none mb-3" style="font-size: 3rem;">
+                        <i class="ti ti-circle-check-filled"></i>
+                    </div>
+
+                    <div class="failed-icon text-danger d-none mb-3" style="font-size: 3rem;">
+                        <i class="ti ti-circle-x-filled"></i>
+                    </div>
+
+                    <h4 class="mb-2">Checkout Status</h4>
+                    <p class="status-message text-muted mb-0">Processing your transaction...</p>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
     <div class="modal fade" id="paymentStatusModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
         aria-hidden="true" style="z-index: 999999;">
         <div class="modal-dialog modal-dialog-centered">
@@ -1892,17 +1918,14 @@
                 <button type="button" class="btn-close position-absolute top-0 end-0 m-3 d-none" data-bs-dismiss="modal"
                     aria-label="Close"></button>
                 <div class="modal-body">
-                    <!-- Spinner (Processing) -->
                     <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
 
-                    <!-- Success Icon -->
                     <div class="success-icon text-success d-none mb-3" style="font-size: 3rem;">
                         <i class="ti ti-circle-check-filled"></i>
                     </div>
 
-                    <!-- Failed Icon -->
                     <div class="failed-icon text-danger d-none mb-3" style="font-size: 3rem;">
                         <i class="ti ti-circle-x-filled"></i>
                     </div>
