@@ -489,10 +489,15 @@ function setupDossierModals() {
 
             const submitBtn = form.querySelector('button[type="submit"]');
             const spinner = submitBtn ? submitBtn.querySelector('.spinner-border') : null;
+            const submitBtnTextEl = submitBtn ? submitBtn.querySelector('span:not(.spinner-border)') : null;
+            const originalBtnText = submitBtnTextEl ? submitBtnTextEl.textContent : '';
 
             try {
                 if (submitBtn) submitBtn.disabled = true;
                 if (spinner) spinner.classList.remove('d-none');
+                if (isApplyMode && submitBtnTextEl) {
+                    submitBtnTextEl.textContent = 'Registering...';
+                }
 
                 // 1. Verify Referral Code in database before submission if written but not checked
                 let referralVerified = referralApplied;
@@ -513,6 +518,11 @@ function setupDossierModals() {
                         if (spinner) spinner.classList.add('d-none');
                         return;
                     }
+                }
+
+                // Show registering popup modal if we are registering a student account
+                if (isApplyMode || referralVerified) {
+                    updatePaymentStatusModal('processing', 'Please wait while we register you...');
                 }
 
                 // 2. Validate email duplicate checks for apply now
@@ -581,6 +591,9 @@ function setupDossierModals() {
                         const modalInstance = bootstrap.Modal.getInstance(modalEl);
                         if (modalInstance) modalInstance.hide();
 
+                        // Close registering popup modal
+                        updatePaymentStatusModal('dismiss');
+
                         // Open congratulations celebrations popup
                         triggerCelebrationPopup();
                         
@@ -598,9 +611,20 @@ function setupDossierModals() {
                         if (modalInstance) modalInstance.hide();
                         
                         // Direct checkout flow
-                        await payment.startCheckout({
-                            name, email, phone, city, state, formId, referralCode
+                        // await payment.startCheckout({
+                        //     name, email, phone, city, state, formId, referralCode
+                        // }, updatePaymentStatusModal);
+
+                        // Direct submission: Skip payment and directly register student
+                        await payment.handlePostPaymentSuccess('DIRECT_SUBMIT', {
+                            name, email, phone, city, state, referralCode
                         }, updatePaymentStatusModal);
+
+                        // Close registering popup modal
+                        updatePaymentStatusModal('dismiss');
+
+                        // Trigger congratulations celebration popup
+                        triggerCelebrationPopup();
                     } else {
                         // Dossier download mode
                         triggerFileDownload(fileUrl, fileName);
@@ -624,6 +648,9 @@ function setupDossierModals() {
             } finally {
                 if (submitBtn) submitBtn.disabled = false;
                 if (spinner) spinner.classList.add('d-none');
+                if (isApplyMode && submitBtnTextEl) {
+                    submitBtnTextEl.textContent = originalBtnText;
+                }
             }
         });
 
@@ -656,10 +683,25 @@ function setupDossierModals() {
                 const modalInstance = bootstrap.Modal.getInstance(modalEl);
                 if (modalInstance) modalInstance.hide();
 
-                // Trigger payment checkout
-                await payment.startCheckout({
-                    name, email, phone, city, state, formId, referralCode
-                }, updatePaymentStatusModal);
+                // Show registering popup modal
+                updatePaymentStatusModal('processing', 'Please wait while we register you...');
+
+                try {
+                    // Direct submission: Skip payment and directly register student
+                    await payment.handlePostPaymentSuccess('DIRECT_SUBMIT', {
+                        name, email, phone, city, state, referralCode
+                    }, updatePaymentStatusModal);
+
+                    // Close registering popup modal
+                    updatePaymentStatusModal('dismiss');
+
+                    // Trigger congratulations celebration popup
+                    triggerCelebrationPopup();
+                } catch (err) {
+                    console.error('[Forms] Pay now direct submit error:', err);
+                } finally {
+                    updatePaymentStatusModal('dismiss');
+                }
             });
         }
     });
