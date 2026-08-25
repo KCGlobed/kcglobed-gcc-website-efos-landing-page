@@ -3,7 +3,7 @@ name: Deploy Application
 on:
   push:
     branches:
-      - affiliate5
+      - main
 
 jobs:
 
@@ -96,7 +96,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           source: "${{ env.ARCHIVE }}"
-          target: "/var/www/apps/affiliate5/releases"
+          target: "/var/www/apps/nfet-efos/releases"
 
       ######################################################
       # Deploy
@@ -110,5 +110,5 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             /opt/deploy-platform/scripts/deploy.sh \
-              "affiliate5" \
+              "nfet-efos" \
               "${{ env.ARCHIVE }}"

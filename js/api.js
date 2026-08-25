@@ -146,40 +146,40 @@ export const api = {
     },
 
     // 7. Initiate Payment Gateway session
-    async startPayment({ name, email, phone, city, state, formId }) {
-        return request(`${CONFIG.LOCAL_API_BASE}/api/start-payment`, {
-            method: 'POST',
-            body: JSON.stringify({
-                user_id: null,
-                name,
-                email,
-                mobile: phone,
-                city,
-                state,
-                form_type: 2,
-                form_id: formId,
-                source: CONFIG.SOURCE
-            })
-        });
-    },
+    // async startPayment({ name, email, phone, city, state, formId }) {
+    //     return request(`${CONFIG.LOCAL_API_BASE}/api/start-payment`, {
+    //         method: 'POST',
+    //         body: JSON.stringify({
+    //             user_id: null,
+    //             name,
+    //             email,
+    //             mobile: phone,
+    //             city,
+    //             state,
+    //             form_type: 2,
+    //             form_id: formId,
+    //             source: CONFIG.SOURCE
+    //         })
+    //     });
+    // },
 
     // 8. Verify and complete payment
-    async completePayment(payload) {
-        return request(`${CONFIG.LOCAL_API_BASE}/api/complete-payment`, {
-            method: 'POST',
-            body: JSON.stringify(payload)
-        });
-    },
+    // async completePayment(payload) {
+    //     return request(`${CONFIG.LOCAL_API_BASE}/api/complete-payment`, {
+    //         method: 'POST',
+    //         body: JSON.stringify(payload)
+    //     });
+    // },
 
     // 9. Report payment failure
-    async reportPaymentFailure(payload) {
-        return request(`${CONFIG.LOCAL_API_BASE}/api/report-payment-failure`, {
-            method: 'POST',
-            body: JSON.stringify(payload)
-        }).catch(err => {
-            console.error('[API] Failed to report payment failure:', err);
-        });
-    },
+    // async reportPaymentFailure(payload) {
+    //     return request(`${CONFIG.LOCAL_API_BASE}/api/report-payment-failure`, {
+    //         method: 'POST',
+    //         body: JSON.stringify(payload)
+    //     }).catch(err => {
+    //         console.error('[API] Failed to report payment failure:', err);
+    //     });
+    // },
 
     // 10. Create Student Account
     async createStudentAccount({ name, email, phone, city, state, referralCode }) {
@@ -202,6 +202,6 @@ export const api = {
         return request(`${CONFIG.LOCAL_API_BASE}/api/log-client-error`, {
             method: 'POST',
             body: JSON.stringify(payload)
-        }).catch(() => { });
+        }).catch(() => {});
     }
 };
