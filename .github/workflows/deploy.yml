@@ -1,4 +1,4 @@
-name: Deploy affiliate5
+name: Deploy Application
 
 on:
   push:
@@ -6,31 +6,77 @@ on:
       - affiliate5
 
 jobs:
+
   deploy:
+
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
+
+      ######################################################
+      # Checkout
+      ######################################################
+
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+      ######################################################
+      # Verify Static Website
+      ######################################################
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build static frontend
-        run: npm run build
-
-      - name: Package build
+      - name: Verify Static Website
         run: |
-          ARCHIVE="release_$(date +%Y%m%d_%H%M%S).tar.gz"
-          tar -czf "$ARCHIVE" -C dist .
-          echo "ARCHIVE=$ARCHIVE" >> $GITHUB_ENV
+          set -e
 
-      - name: Upload Package
-        uses: appleboy/scp-action@master
+          echo "=============================================="
+          echo "Static HTML Deployment"
+          echo "=============================================="
+
+          if [ ! -f "index.html" ]; then
+            echo "ERROR: index.html not found in repository root."
+            echo ""
+            echo "This deployment is configured as runtime=static."
+            echo "A static application must contain index.html."
+            exit 1
+          fi
+
+          echo "index.html found."
+          echo "No Node.js required."
+          echo "No npm install required."
+          echo "No build step required."
+
+      ######################################################
+      # Package Static Website
+      ######################################################
+
+      - name: Package Static Website
+        run: |
+          set -e
+
+          ARCHIVE="release_$(date +%Y%m%d_%H%M%S).tar.gz"
+
+          echo "=============================================="
+          echo "Packaging Static Website"
+          echo "=============================================="
+          echo "Archive: $ARCHIVE"
+
+          tar -czf "$ARCHIVE" \
+            --exclude=".git" \
+            --exclude=".github" \
+            .
+
+          echo "ARCHIVE=$ARCHIVE" >> "$GITHUB_ENV"
+
+          echo ""
+          echo "Archive created successfully:"
+          ls -lh "$ARCHIVE"
+
+      ######################################################
+      # Upload Package
+      ######################################################
+
+      - name: Copy Package
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
@@ -38,7 +84,11 @@ jobs:
           source: "${{ env.ARCHIVE }}"
           target: "/var/www/apps/affiliate5/releases"
 
-      - name: Deploy application
+      ######################################################
+      # Trigger Deployment
+      ######################################################
+
+      - name: Trigger Deployment
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -46,5 +96,12 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             set -e
-            echo "Deploying affiliate5..."
-            sudo /opt/deploy-platform/scripts/deploy.sh "affiliate5" "${{ env.ARCHIVE }}"
+
+            echo "=============================================="
+            echo "Deploying affiliate5"
+            echo "Release: ${{ env.ARCHIVE }}"
+            echo "=============================================="
+
+            sudo /opt/deploy-platform/scripts/deploy.sh \
+              "affiliate5" \
+              "${{ env.ARCHIVE }}"
