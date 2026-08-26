@@ -54,24 +54,74 @@ jobs:
           set -e
 
           ARCHIVE="release_$(date +%Y%m%d_%H%M%S).tar.gz"
+          ARCHIVE_PATH="${RUNNER_TEMP}/${ARCHIVE}"
 
           echo "=============================================="
           echo "Packaging Static Website"
           echo "=============================================="
           echo "Archive: $ARCHIVE"
+          echo "Temporary path: $ARCHIVE_PATH"
 
-          tar -czf "$ARCHIVE" \
+          # The archive is created outside the repository.
+          # This prevents tar from detecting the archive itself
+          # while reading the repository directory.
+
+          tar -czf "$ARCHIVE_PATH" \
             --exclude=".git" \
             --exclude=".github" \
-            --exclude="$ARCHIVE" \
             --exclude="*.tar.gz" \
             .
+
+          # Move the completed archive into the GitHub workspace
+          # only after tar has finished creating it.
+
+          mv "$ARCHIVE_PATH" "$GITHUB_WORKSPACE/$ARCHIVE"
 
           echo "ARCHIVE=$ARCHIVE" >> "$GITHUB_ENV"
 
           echo ""
           echo "Archive created successfully:"
-          ls -lh "$ARCHIVE"
+          ls -lh "$GITHUB_WORKSPACE/$ARCHIVE"
+
+      ######################################################
+      # Verify Package
+      ######################################################
+
+      - name: Verify Package
+        run: |
+          set -e
+
+          echo "=============================================="
+          echo "Verifying Deployment Archive"
+          echo "=============================================="
+
+          if [ -z "${ARCHIVE}" ]; then
+            echo "ERROR: ARCHIVE environment variable is empty."
+            exit 1
+          fi
+
+          if [ ! -f "$GITHUB_WORKSPACE/$ARCHIVE" ]; then
+            echo "ERROR: Archive not found:"
+            echo "$GITHUB_WORKSPACE/$ARCHIVE"
+            exit 1
+          fi
+
+          echo "Archive exists:"
+          ls -lh "$GITHUB_WORKSPACE/$ARCHIVE"
+
+          echo ""
+          echo "Checking archive contents..."
+
+          if ! tar -tzf "$GITHUB_WORKSPACE/$ARCHIVE" | grep -qx "index.html"; then
+            echo "ERROR: index.html was not found at the root of the archive."
+            echo ""
+            echo "Archive contents:"
+            tar -tzf "$GITHUB_WORKSPACE/$ARCHIVE"
+            exit 1
+          fi
+
+          echo "index.html found at archive root."
+          echo "Archive verification successful."
 
       ######################################################
       # Upload Package
@@ -107,3 +157,8 @@ jobs:
             sudo /opt/deploy-platform/scripts/deploy.sh \
               "affiliate5" \
               "${{ env.ARCHIVE }}"
+
+            echo ""
+            echo "=============================================="
+            echo "Deployment Triggered Successfully"
+            echo "=============================================="
