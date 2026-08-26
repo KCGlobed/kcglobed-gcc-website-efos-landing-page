@@ -1,34 +1,34 @@
 name: Deploy affiliate5
- 
+
 on:
   push:
     branches:
       - affiliate5
- 
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
- 
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
- 
+
       - name: Install dependencies
         run: npm install
- 
+
       - name: Build static frontend
         run: npm run build
- 
+
       - name: Package build
         run: |
           ARCHIVE="release_$(date +%Y%m%d_%H%M%S).tar.gz"
           tar -czf "$ARCHIVE" -C dist .
           echo "ARCHIVE=$ARCHIVE" >> $GITHUB_ENV
- 
+
       - name: Upload Package
         uses: appleboy/scp-action@master
         with:
@@ -37,7 +37,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           source: "${{ env.ARCHIVE }}"
           target: "/var/www/apps/affiliate5/releases"
- 
+
       - name: Deploy application
         uses: appleboy/ssh-action@v1.2.2
         with:
