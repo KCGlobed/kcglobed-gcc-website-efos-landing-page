@@ -62,9 +62,9 @@ jobs:
           echo "Archive: $ARCHIVE"
           echo "Temporary path: $ARCHIVE_PATH"
 
-          # The archive is created outside the repository.
-          # This prevents tar from detecting the archive itself
-          # while reading the repository directory.
+          # Create archive outside the repository.
+          # This prevents tar from reading the archive while
+          # it is simultaneously being created.
 
           tar -czf "$ARCHIVE_PATH" \
             --exclude=".git" \
@@ -72,8 +72,8 @@ jobs:
             --exclude="*.tar.gz" \
             .
 
-          # Move the completed archive into the GitHub workspace
-          # only after tar has finished creating it.
+          # Move completed archive into workspace only after
+          # tar has finished creating it.
 
           mv "$ARCHIVE_PATH" "$GITHUB_WORKSPACE/$ARCHIVE"
 
@@ -100,23 +100,25 @@ jobs:
             exit 1
           fi
 
-          if [ ! -f "$GITHUB_WORKSPACE/$ARCHIVE" ]; then
+          ARCHIVE_PATH="$GITHUB_WORKSPACE/$ARCHIVE"
+
+          if [ ! -f "$ARCHIVE_PATH" ]; then
             echo "ERROR: Archive not found:"
-            echo "$GITHUB_WORKSPACE/$ARCHIVE"
+            echo "$ARCHIVE_PATH"
             exit 1
           fi
 
           echo "Archive exists:"
-          ls -lh "$GITHUB_WORKSPACE/$ARCHIVE"
+          ls -lh "$ARCHIVE_PATH"
 
           echo ""
           echo "Checking archive contents..."
 
-          if ! tar -tzf "$GITHUB_WORKSPACE/$ARCHIVE" | grep -qx "index.html"; then
+          if ! tar -tzf "$ARCHIVE_PATH" | grep -Eq '^\./?index\.html$'; then
             echo "ERROR: index.html was not found at the root of the archive."
             echo ""
             echo "Archive contents:"
-            tar -tzf "$GITHUB_WORKSPACE/$ARCHIVE"
+            tar -tzf "$ARCHIVE_PATH"
             exit 1
           fi
 
