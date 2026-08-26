@@ -114,36 +114,35 @@ export const api = {
     },
 
     // 5. Submit Enquiry Form
-    async submitEnquiry(payload) {
-        return request(`${CONFIG.LOCAL_API_BASE}/api/enquery`, {
-            method: 'POST',
-            body: JSON.stringify(payload)
-        });
-    },
+    // async submitEnquiry(payload) {
+    //     return request(`${CONFIG.LOCAL_API_BASE}/api/enquery`, {
+    //         method: 'POST',
+    //         body: JSON.stringify(payload)
+    //     });
+    // },
 
     // 6. Save Local Lead progress
-    async saveLocalLead({ name, email, phone, state, city, formId, action, utm }) {
-        return request(`${CONFIG.LOCAL_API_BASE}/api/save-lead`, {
-            method: 'POST',
-            body: JSON.stringify({
-                name,
-                email,
-                mobile: phone,
-                state,
-                city,
-                form_type: 2,
-                form_id: formId,
-                action: action,
-                utm_source: utm.source || '',
-                utm_medium: utm.medium || '',
-                utm_campaign: utm.campaign || '',
-                source: CONFIG.SOURCE
-            })
-        }).catch(err => {
-            // Silently fail to not interrupt user checkout flow
-            console.error('[API] saveLead failed:', err);
-        });
-    },
+    // async saveLocalLead({ name, email, phone, state, city, formId, action, utm }) {
+    //     return request(`${CONFIG.LOCAL_API_BASE}/api/save-lead`, {
+    //         method: 'POST',
+    //         body: JSON.stringify({
+    //             name,
+    //             email,
+    //             mobile: phone,
+    //             state,
+    //             city,
+    //             form_type: 2,
+    //             form_id: formId,
+    //             action: action,
+    //             utm_source: utm.source || '',
+    //             utm_medium: utm.medium || '',
+    //             utm_campaign: utm.campaign || '',
+    //             source: CONFIG.SOURCE
+    //         })
+    //     }).catch(err => {
+    //         console.error('[API] saveLead failed:', err);
+    //     });
+    // },
 
     // 7. Initiate Payment Gateway session
     // async startPayment({ name, email, phone, city, state, formId }) {
@@ -198,16 +197,16 @@ export const api = {
     },
 
     // 11. Auto-login student
-    async autoLogin(email, password) {
-        return request(`${CONFIG.BACKEND_API_BASE}/api/users/website_login/`, {
-            method: 'POST',
-            body: JSON.stringify({
-                email,
-                password,
-                role: 'student'
-            })
-        });
-    },
+    // async autoLogin(email, password) {
+    //     return request(`${CONFIG.BACKEND_API_BASE}/api/users/website_login/`, {
+    //         method: 'POST',
+    //         body: JSON.stringify({
+    //             email,
+    //             password,
+    //             role: 'student'
+    //         })
+    //     });
+    // },
 
     // 12. Log client side errors to server
     async logClientError(payload) {

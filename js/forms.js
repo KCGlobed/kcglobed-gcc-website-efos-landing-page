@@ -567,16 +567,15 @@ function setupDossierModals() {
                     const fileName = fileUrl.split('/').pop() || 'Dossier.pdf';
 
                     // Save local lead status
-                    await api.saveLocalLead({
-                        name, email, phone, state, city,
-                        formId,
-                        action: isApplyMode ? 'pay_now_clicked' : 'download_dossier_clicked',
-                        utm: getUtmParams()
-                    });
+                    // await api.saveLocalLead({
+                    //     name, email, phone, state, city,
+                    //     formId,
+                    //     action: isApplyMode ? 'pay_now_clicked' : 'download_dossier_clicked',
+                    //     utm: getUtmParams()
+                    // });
 
                     // 4. Handle Free Coupon Fee Waiver
                     if (referralVerified) {
-                        // Skip payment gateways, create account and show celebration overlay
                         await payment.handlePostPaymentSuccess('REFERRAL_CODE', {
                             name, email, phone, city, state, referralCode
                         }, updatePaymentStatusModal);
@@ -708,8 +707,8 @@ function setupDossierModals() {
 
 // Helper to download pdf files
 function triggerFileDownload(url, filename) {
-    // Uses standard proxy route to bypass CORS block on storage download headers
-    window.location.href = `/api/download?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(filename)}`;
+    // Open in a new tab directly since we don't have a backend proxy route for this static site
+    window.open(url, '_blank');
 }
 
 // Helper to show celebration overlay confetti animation
