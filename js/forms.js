@@ -233,7 +233,7 @@ function setupEnquiryForm() {
                 if (modalInstance) modalInstance.hide();
                 
                 // Open brochure
-                window.open("https://storage.googleapis.com/static_files_backend/media/landing/GCC%20School%20Brochure%201.pdf", "_blank");
+                window.open("https://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/media/landing/GCC%20School%20Brochure%201.pdf", "_blank");
                 
                 form.reset();
                 checkConditionalToggles();
