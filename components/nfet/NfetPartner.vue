@@ -22,12 +22,12 @@
 const partners = [
     {
         name: 'AON',
-        logo: 'https://storage.googleapis.com/static_files_backend/media/images/image%201.png',
+        logo: 'https://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/media/images/image%201.png',
         description: 'Global professional services firm supporting talent assessment and benchmarking',
     },
     {
         name: 'Meritto',
-        logo: 'https://storage.googleapis.com/static_files_backend/media/images/image%202.png',
+        logo: 'https://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/media/images/image%202.png',
         description: 'Technology partner enabling secure and scalable examination delivery',
     },
 ]

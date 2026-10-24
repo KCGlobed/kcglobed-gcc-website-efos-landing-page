@@ -15,8 +15,8 @@
             <img class="gi gi-5" :src="images[4]" />
         </div>
         <!-- Video -->
-        <!-- <VideoBox video-src="https://storage.googleapis.com/gcc_static_files_backend/static/videos/lms_tutorial.mp4"
-            thumbnail-src="https://storage.googleapis.com/gcc_prod_static_files_backend/static/images/kamalchhabbraadd.jpeg" /> -->
+        <!-- <VideoBox video-src="https://pub-036d749647594301a3092e501d1d3b5f.r2.dev/static/videos/lms_tutorial.mp4"
+            thumbnail-src="https://pub-1c3aa4d882c24d66ac8e49a3fe6fbb71.r2.dev/static/images/kamalchhabbraadd.jpeg" /> -->
 
         <!-- Dots -->
         <!-- <div class="dots">

@@ -14,7 +14,7 @@
                     <div class="pathway-visual-container">
                         <div class="image-wrapper">
                             <div class="WebImageGraphImag">
-                                <img src="https://storage.googleapis.com/static_files_backend/media/images/Group%2051402%20(1).png"
+                                <img src="https://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/media/images/Group%2051402%20(1).png"
                                     alt="GCC Learning Pathway" class="pathway-graphic">
                             </div>
                             <div class="mobileImageGraphImag">

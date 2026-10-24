@@ -11,7 +11,7 @@
 
                 <div class="col-lg-12">
                     <div class="campus-image">
-                        <img src="https://storage.googleapis.com/static_files_backend/media/images/AdobeStock_946334569_Editorial_Use_Only.jpeg"
+                        <img src="https://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/media/images/AdobeStock_946334569_Editorial_Use_Only.jpeg"
                             alt="Our Campus" />
                     </div>
                 </div>

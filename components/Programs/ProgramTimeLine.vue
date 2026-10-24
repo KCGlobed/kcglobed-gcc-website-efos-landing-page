@@ -18,7 +18,7 @@
                     </div>
                     <div class="col-lg-7 order-1 order-lg-2">
                         <div class="step-image">
-                            <img src="https://storage.googleapis.com/static_files_backend/media/images/Corporate%20Classroom.png"
+                            <img src="https://phttps://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/mediaub-036d749647594301a3092e501d1d3b5f.r2.dev/images/Corporate%20Classroom.png"
                                 alt="Step 1">
                         </div>
                     </div>
@@ -30,7 +30,7 @@
                 <div class="row g-0 align-items-stretch">
                     <div class="col-lg-7">
                         <div class="step-image">
-                            <img src="https://storage.googleapis.com/static_files_backend/media/images/Corporate%20Classroom%20(1).png"
+                            <img src="https://phttps://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/mediaub-036d749647594301a3092e501d1d3b5f.r2.dev/images/Corporate%20Classroom%20(1).png"
                                 alt="Step 2">
                         </div>
                     </div>
@@ -57,7 +57,7 @@
                     </div>
                     <div class="col-lg-7 order-1 order-lg-2">
                         <div class="step-image">
-                            <img src="https://storage.googleapis.com/static_files_backend/media/images/Corporate%20Classroom%20(2).png"
+                            <img src="https://phttps://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/mediaub-036d749647594301a3092e501d1d3b5f.r2.dev/images/Corporate%20Classroom%20(2).png"
                                 alt="Step 3">
                         </div>
                     </div>
@@ -68,7 +68,7 @@
                 <div class="row g-0 align-items-stretch">
                     <div class="col-lg-7">
                         <div class="step-image">
-                            <img src="https://storage.googleapis.com/static_files_backend/media/images/Corporate%20Classroom%20(3).png"
+                            <img src="https://phttps://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/mediaub-036d749647594301a3092e501d1d3b5f.r2.dev/images/Corporate%20Classroom%20(3).png"
                                 alt="Step 2">
                         </div>
                     </div>
@@ -95,7 +95,7 @@
                     </div>
                     <div class="col-lg-7 order-1 order-lg-2">
                         <div class="step-image">
-                            <img src="https://storage.googleapis.com/static_files_backend/media/images/Hiring%20Drives.png"
+                            <img src="https://phttps://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/mediaub-036d749647594301a3092e501d1d3b5f.r2.dev/images/Hiring%20Drives.png"
                                 alt="Step 3">
                         </div>
                     </div>
@@ -106,7 +106,7 @@
                 <div class="row g-0 align-items-stretch">
                     <div class="col-lg-7">
                         <div class="step-image">
-                            <img src="https://storage.googleapis.com/static_files_backend/media/images/Corporate%20Classroom%20(4).png"
+                            <img src="https://phttps://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/mediaub-036d749647594301a3092e501d1d3b5f.r2.dev/images/Corporate%20Classroom%20(4).png"
                                 alt="Step 2">
                         </div>
                     </div>
@@ -133,7 +133,7 @@
                     </div>
                     <div class="col-lg-7 order-1 order-lg-2">
                         <div class="step-image">
-                            <img src="https://storage.googleapis.com/static_files_backend/media/images/Corporate%20Classroom%20(5).png"
+                            <img src="https://phttps://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/mediaub-036d749647594301a3092e501d1d3b5f.r2.dev/images/Corporate%20Classroom%20(5).png"
                                 alt="Step 3">
                         </div>
                     </div>

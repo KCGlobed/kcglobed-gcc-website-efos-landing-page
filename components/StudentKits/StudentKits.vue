@@ -86,12 +86,12 @@ const currentKitTitle = ref("");
 
 // Student Kits configuration
 const studentKits = [
-    { title: "GCC School Journey Overview", mediaUrl: "https://storage.googleapis.com/gcc_static_files_backend/static/videos/GCC%20School%20Journey%20Overview.mp4", type: "video" },
-    { title: "NFET Exam Walkthrough Video", mediaUrl: "https://storage.googleapis.com/gcc_static_files_backend/static/videos/NFET%20Exam%20Walkthrough%20Video.mp4", type: "video" },
-    { title: "AEIAP Program Overview", mediaUrl: "https://storage.googleapis.com/gcc_static_files_backend/static/videos/AEIAP%20Program%20Overview.mp4", type: "video" },
-    { title: "British Council - English for Work Course Overview", mediaUrl: "https://storage.googleapis.com/gcc_static_files_backend/static/videos/British%20Council%20%E2%80%93%20English%20for%20Work%20Course%20Overview.mp4", type: "video" },
-    { title: "AON - Test Platform Walkthrough", mediaUrl: "https://storage.googleapis.com/gcc_static_files_backend/static/videos/AON%20%E2%80%93%20Test%20Platform%20Walkthrough.mp4", type: "video" },
-    { title: "Best Interview Questions", mediaUrl: "https://storage.googleapis.com/gcc_static_files_backend/static/videos/Best%20Interview%20Questions.pdf", type: "pdf" },
+    { title: "GCC School Journey Overview", mediaUrl: "https://pub-036d749647594301a3092e501d1d3b5f.r2.dev/static/videos/GCC%20School%20Journey%20Overview.mp4", type: "video" },
+    { title: "NFET Exam Walkthrough Video", mediaUrl: "https://pub-036d749647594301a3092e501d1d3b5f.r2.dev/static/videos/NFET%20Exam%20Walkthrough%20Video.mp4", type: "video" },
+    { title: "AEIAP Program Overview", mediaUrl: "https://pub-036d749647594301a3092e501d1d3b5f.r2.dev/static/videos/AEIAP%20Program%20Overview.mp4", type: "video" },
+    { title: "British Council - English for Work Course Overview", mediaUrl: "https://pub-036d749647594301a3092e501d1d3b5f.r2.dev/static/videos/British%20Council%20%E2%80%93%20English%20for%20Work%20Course%20Overview.mp4", type: "video" },
+    { title: "AON - Test Platform Walkthrough", mediaUrl: "https://pub-036d749647594301a3092e501d1d3b5f.r2.dev/static/videos/AON%20%E2%80%93%20Test%20Platform%20Walkthrough.mp4", type: "video" },
+    { title: "Best Interview Questions", mediaUrl: "https://pub-036d749647594301a3092e501d1d3b5f.r2.dev/static/videos/Best%20Interview%20Questions.pdf", type: "pdf" },
     { title: "Mock Test", link: "https://cocubes.in/gccschool-nfet-mock", type: "link" }
 ];
 

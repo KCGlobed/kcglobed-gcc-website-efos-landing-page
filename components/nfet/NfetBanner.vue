@@ -33,7 +33,7 @@
                     <div class="video-wrapper">
                         <div class="video-container">
                             <img v-if="!isPlaying"
-                                src="https://storage.googleapis.com/static_files_backend/media/images/manna%20sir%20thmbnl%20(1).jpg"
+                                src="https://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/media/images/manna%20sir%20thmbnl%20(1).jpg"
                                 alt="NFET Video Thumbnail" class="video-thumb" />
                             <!-- <iframe v-if="isPlaying" src="" frameborder="0" allow="autoplay; encrypted-media"
                                 allowfullscreen class="video-iframe"></iframe> -->

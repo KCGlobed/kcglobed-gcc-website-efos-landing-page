@@ -49,7 +49,7 @@ export async function sendPaymentConfirmationEmail(opts: PaymentEmailOptions) {
           <!-- Header -->
           <tr>
             <td style="background:linear-gradient(135deg,#3D1C6E 0%,#A13E99 100%);padding:40px 40px 30px;text-align:center;">
-              <img src="https://storage.googleapis.com/gcc_prod_static_files_backend/static/images/gcc_school_logo.png"
+              <img src="https://pub-1c3aa4d882c24d66ac8e49a3fe6fbb71.r2.dev/static/images/gcc_school_logo.png"
                    alt="GCC School" height="60"
                    style="height:60px;display:block;margin:0 auto 20px;" />
               <h1 style="color:#ffffff;font-size:26px;font-weight:700;margin:0;letter-spacing:-0.5px;">

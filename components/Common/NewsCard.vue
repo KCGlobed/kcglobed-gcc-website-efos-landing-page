@@ -66,7 +66,7 @@ const newsList = [
         excerpt: 'GCC School and KC GlobEd successfully organised a dynamic Round Table meeting on the theme Impact of AI on GCCs - Building the Future Workforce at Welcome hotel by ITC Hotels, Delhi-Gurugram Highway. The session witnessed participation from senior leaders of reputed organisations...',
         date: 'Jan 29, 2026',
         category: 'Business & Finance',
-        image: 'https://storage.googleapis.com/gcc_prod_static_files_backend/static/images/download.png',
+        image: 'https://pub-1c3aa4d882c24d66ac8e49a3fe6fbb71.r2.dev/static/images/download.png',
         url: 'https://www.ptinews.com/press-release/gcc-school-and-kc-globed-host-round-table-meeting-on-impact-of-ai-on-gccs-building-the-future-workforce/3323548'
     },
     {
@@ -75,7 +75,7 @@ const newsList = [
         excerpt: ' GCC School and KC GlobEd successfully organised a dynamic Round Table meeting on the theme “Impact of AI on GCCs – Building the Future Workforce” at Welcome hotel by ITC Hotels, Delhi-Gurugram Highway....',
         date: 'Nov 14, 2025',
         category: 'Business & Finance',
-        image: 'https://storage.googleapis.com/static_files_backend/media/images/image%20(1).jpg',
+        image: 'https://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/media/images/image%20(1).jpg',
         url: 'https://english.indianews.in/india-news/gcc-school-and-kc-globed-host-round-table-meeting-on-impact-of-ai-on-gccs-building-the-future-workforce-848368/'
     },
 
@@ -85,7 +85,7 @@ const newsList = [
         excerpt: 'The 2nd edition of Tech4Ed International Conference 2025, organised under the aegis of the Association of Indian Universities (AIU) and KC GlobEd, concluded on an inspiring note at The Park, New Delhi. The event brought together a distinguished gathering of academic leaders...',
         date: 'Nov 14, 2025',
         category: 'Tech4ed',
-        image: 'https://storage.googleapis.com/gcc_prod_static_files_backend/static/images/F_92102image_story.jpeg',
+        image: 'https://pub-1c3aa4d882c24d66ac8e49a3fe6fbb71.r2.dev/static/images/F_92102image_story.jpeg',
         url: 'https://menafn.com/1110349919/Tech4ed-2025-Sets-New-Benchmark-In-Global-Learning-With-Strategic-Collaborations-And-Knowledge-Exchange'
     },
 

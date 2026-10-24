@@ -137,7 +137,7 @@
                                     <div class="video-section">
                                         <div class="video-wrapper">
                                             <template v-if="!banner.showVideo">
-                                                <img src="https://storage.googleapis.com/static_files_backend/media/images/nitish%20sir%20thmbnl_.jpg"
+                                                <img src="https://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/media/images/nitish%20sir%20thmbnl_.jpg"
                                                     alt="Program Video" class="video-thumbnail">
                                                 <!-- <div class="video-badge-4k">
                                                     4k
@@ -154,7 +154,7 @@
                                             </template>
                                             <!-- <video v-else controls autoplay class="video-element w-100 h-100">
                                                 <source
-                                                    src="https://storage.googleapis.com/gcc_static_files_backend/static/videos/lms_tutorial.mp4"
+                                                    src="https://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/media/static/videos/lms_tutorial.mp4"
                                                     type="video/mp4">
                                                 Your browser does not support the video tag.
                                             </video> -->

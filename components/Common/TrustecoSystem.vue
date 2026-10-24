@@ -72,22 +72,22 @@ const ecosystemData = [
 ];
 
 const ecosystemImages = [
-    { image: "https://storage.googleapis.com/static_files_backend/media/images/Group%2049956.png" },
-    { image: "https://storage.googleapis.com/static_files_backend/media/images/Group%2049950%201.png" },
-    { image: "https://storage.googleapis.com/static_files_backend/media/images/Group%2049941.png" },
-    { image: "https://storage.googleapis.com/static_files_backend/media/images/Group%2049942.png" },
-    { image: "https://storage.googleapis.com/static_files_backend/media/images/Group%2049947.png" },
-    { image: "https://storage.googleapis.com/static_files_backend/media/images/Group%2049949.png" },
-    { image: "https://storage.googleapis.com/static_files_backend/media/images/Group%2049952.png" },
-    { image: "https://storage.googleapis.com/static_files_backend/media/images/Group%2049939.png" },
-    { image: "https://storage.googleapis.com/static_files_backend/media/images/Group%2049943.png" },
-    { image: "https://storage.googleapis.com/static_files_backend/media/images/7qrb04.tif%201.png" },
-    { image: "https://storage.googleapis.com/static_files_backend/media/images/Group%2049944.png" },
-    { image: "https://storage.googleapis.com/static_files_backend/media/images/Group%2049951.png" },
-    { image: "https://storage.googleapis.com/static_files_backend/media/images/Group%2049953.png" },
-    { image: "https://storage.googleapis.com/static_files_backend/media/images/Group%2049955%20(1).png" },
-    { image: "https://storage.googleapis.com/static_files_backend/media/images/Group%2049945.png" },
-    { image: "https://storage.googleapis.com/static_files_backend/media/images/Group%2049954.png" },
+    { image: "https://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/media/images/Group%2049956.png" },
+    { image: "https://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/media/images/Group%2049950%201.png" },
+    { image: "https://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/media/images/Group%2049941.png" },
+    { image: "https://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/media/images/Group%2049942.png" },
+    { image: "https://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/media/images/Group%2049947.png" },
+    { image: "https://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/media/images/Group%2049949.png" },
+    { image: "https://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/media/images/Group%2049952.png" },
+    { image: "https://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/media/images/Group%2049939.png" },
+    { image: "https://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/media/images/Group%2049943.png" },
+    { image: "https://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/media/images/7qrb04.tif%201.png" },
+    { image: "https://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/media/images/Group%2049944.png" },
+    { image: "https://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/media/images/Group%2049951.png" },
+    { image: "https://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/media/images/Group%2049953.png" },
+    { image: "https://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/media/images/Group%2049955%20(1).png" },
+    { image: "https://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/media/images/Group%2049945.png" },
+    { image: "https://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/media/images/Group%2049954.png" },
 
 ];
 

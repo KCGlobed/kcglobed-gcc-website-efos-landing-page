@@ -49,7 +49,7 @@
                   @pause="isVideoPlaying = false" controlsList="nodownload" @contextmenu.prevent
                   style="object-fit: contain; background: #0b0b1a;">
                   <source
-                    src="https://storage.googleapis.com/static_files_backend/media/images/Kamal%20Sir%20Video_1.mp4"
+                    src="https://phttps://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/mediaub-036d749647594301a3092e501d1d3b5f.r2.dev/images/Kamal%20Sir%20Video_1.mp4"
                     type="video/mp4">
                   Your browser does not support the video tag.
                 </video>
@@ -62,7 +62,7 @@
                 </div>
                 <!-- Thumbnail Mask (visible before play) -->
                 <img v-if="!isVideoPlaying"
-                  src="https://storage.googleapis.com/static_files_backend/media/images/kamal%20sir%20thnml%202.jpg"
+                  src="https://phttps://pub-9c0647755fb64a018ac13430cf4fc25f.r2.dev/mediaub-036d749647594301a3092e501d1d3b5f.r2.dev/images/kamal%20sir%20thnml%202.jpg"
                   class="video-poster-img" @click="playVideo" alt="Thumbnail">
               </div>
               <!-- <div class="video-badge-new">

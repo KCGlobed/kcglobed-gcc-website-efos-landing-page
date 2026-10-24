@@ -46,11 +46,11 @@
                             <video ref="directorVideo" v-show="isVideoPlaying" :controls="isVideoPlaying"
                                 controlsList="nodownload" @contextmenu.prevent class="preview-img">
                                 <source
-                                    src="https://storage.googleapis.com/gcc_static_files_backend/static/videos/MANNA%20SIR%20WEBSITE_FINAL%20100.mp4"
+                                    src="https://pub-036d749647594301a3092e501d1d3b5f.r2.dev/static/videos/MANNA%20SIR%20WEBSITE_FINAL%20100.mp4"
                                     type="video/mp4" />
                             </video>
                             <img v-show="!isVideoPlaying"
-                                src="https://storage.googleapis.com/gcc_static_files_backend/static/images/manna%20sir%20thmbnl.jpg"
+                                src="https://pub-036d749647594301a3092e501d1d3b5f.r2.dev/static/images/manna%20sir%20thmbnl.jpg"
                                 alt="ED Message Video Preview" class="preview-img">
                             <div v-show="!isVideoPlaying" class="play-btn-wrap">
                                 <div class="play-btn">
